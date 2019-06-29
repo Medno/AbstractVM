@@ -16,7 +16,8 @@ NAME = avm
 
 #------All sources------#
 
-SRCS = main.cpp
+SRCS = main.cpp		\
+	   Lexer.cpp
 
 OBJ += $(addprefix ./$(OBJ_PATH)/, $(SRCS:.cpp=.o))
 
@@ -24,9 +25,12 @@ OBJ += $(addprefix ./$(OBJ_PATH)/, $(SRCS:.cpp=.o))
 
 INCLUDES = ./inc/
 INC += -I $(INCLUDES)
-INC += -I $(LIB_PATH)/$(INCLUDES)
 
-HEAD =	$(INCLUDES)/.hpp
+HEAD = $(addprefix $(INCLUDES), \
+		IOperand.hpp	\
+		Lexer.hpp		\
+		Types.hpp		\
+)
 
 #------Path------#
 
@@ -37,7 +41,7 @@ OBJ_PATH  = obj
 
 all: $(OBJ_PATH) $(NAME)
 
-$(NAME): $(LIB) $(OBJ)
+$(NAME): $(OBJ)
 	@printf "\33[2KObjects created $(BOLD_GREEN)✓$(EOC)\n"
 	@printf "Start making $(NAME)...\n"
 	@$(CCPP) $(CPP_FLAGS) $(LIBCURSES) $(FLAGS) $(INC) -o $(NAME) $(OBJ)
