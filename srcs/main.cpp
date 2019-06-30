@@ -5,7 +5,7 @@
 #include <fstream>
 
 std::string	readStdin( void ) {
-	std::string line;
+	std::string			line;
 	std::stringstream	ss;
 
 	while ( std::getline(std::cin, line) && line != ";;")
@@ -42,7 +42,7 @@ int	main( int ac, char **av ) {
 		str = readFile( av[1] );
 	if (str != "") {
 		Lexer	lexer(str);
-		std::cout << str;
+//		std::cout << str;
 	}
 	return ( 0 );
 }
