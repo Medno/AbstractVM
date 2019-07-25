@@ -14,6 +14,10 @@
 
 NAME = avm
 
+TESTS = tests/empty.test tests/oneline.test \
+	tests/oneline_several_str.test tests/several_lines_one_str.test\
+	tests/several_lines_several_str.test tests/instr.test tests/newline.test
+
 #------All sources------#
 
 SRCS = main.cpp		\
@@ -64,6 +68,9 @@ fclean: clean
 	@echo "$(BOLD_GREEN)$(NAME)$(EOC) fclean $(BOLD_GREEN)✓$(EOC)"
 
 re: fclean all
+
+test:
+	@$(foreach var,$(TESTS),echo "-------------Tests for $(var)-------------" && ./$(NAME) $(var);)
 
 #------Compilation's flags------#
 
