@@ -19,19 +19,30 @@ Lexer	& Lexer::operator=( Lexer const & rhs ) {
 }
 
 std::vector<std::string>	Lexer::split( void ) {
-	size_t	pos = 0;
 	size_t	nl;
+	size_t	pos = 0;
+	std::string	substr;
 	std::vector<std::string>	lines;
 
 	while ( pos < this->_stream.size() ) {
 		nl = this->_stream.find("\n", pos);
+		std::cout << nl << std::endl;
 		if ( nl == std::string::npos )
 			lines.push_back(this->_stream.substr(pos, this->_stream.size() - pos));
-		else
-			lines.push_back(this->_stream.substr(pos, nl - pos));
+		else if ((substr = this->_stream.substr(pos, nl - pos)) != "")
+			lines.push_back(substr);
 		pos = nl + 1;
 	}
 	return ( lines );
+}
+
+void	Lexer::tokenize( std::vector<std::string> const & lines ) {
+	std::vector<tokens>	token_line;
+	
+	for(std::vector<std::string>::iterator it = lines.begin(); it != lines.end(); ++it) {
+		
+	}
+
 }
 
 //Analyze lines by lines

@@ -22,6 +22,8 @@ enum	tokenLabel {
 	O_BRACKET,
 	C_BRACKET,
 	VALUE,
+	N,
+	Z,
 	OTHER
 };
 
@@ -33,12 +35,15 @@ public:
 	Lexer	& operator=( Lexer const & );
 
 	std::vector<std::string>	split( void );
+	void	tokenize( std::vector<std::string> const & );
 	void	lexLine( std::string const & );
 	void	lex( void );
 
+	typedef std::pair<tokenLabel, std::string> tokens;
+
 private:
 	std::string	_stream;
-	std::vector<std::pair<tokenLabel, std::string> >	_tokens;
+	std::vector<std::vector<tokens > >	_tokens;
 	
 };
 
