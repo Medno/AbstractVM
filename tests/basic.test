@@ -1,4 +1,5 @@
 ; Basic test
+;
 
 push int8(2)
 push int8(5)

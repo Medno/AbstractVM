@@ -30,7 +30,7 @@ Lexer	& Lexer::operator=( Lexer const & rhs ) {
 	return *this;
 }
 
-void	Lexer::print( void ) {
+void	Lexer::print( void ) const {
 	for ( auto&& lines : this->_tokens ) {
 		std::cout << "Line : " << &lines-&this->_tokens[0] + 1 << std::endl;
 		for ( auto&& token : lines ) {
@@ -59,20 +59,23 @@ Lexer::splitStr(std::string const &str, std::string const & spl) const {
 	return ( line );
 }
 
-std::vector<std::vector<std::string> >	Lexer::splitStream( void ) const {
+std::vector<std::vector<std::string> >	Lexer::filterStream( void ) const {
+	size_t	nl;
+	std::regex	parenthese("([[:alnum:]]) *\\( *(.*) *\\)");
 	std::vector<std::string>	lines;
 	std::vector<std::string>	words;
 	std::vector<std::vector <std::string> >	splitted;
-	std::regex	oParenthese("([[:alnum:]]) *\\( *(.*) *\\)");
-//	std::regex	cParenthese("([[:digit:]])\\)");
-//i[a-z]\(( +)?([0-9]+)?( +)?\)
+
 	lines = splitStr(this->_stream, "\n");
 	for (auto&& l : lines) {
-		l = std::regex_replace (l,oParenthese,"$1 ( $2 )");
-//		l = std::regex_replace (l,cParenthese,"$1 )");
+		nl = l.find(";", 0);
+		if ( nl != std::string::npos )
+			l.erase(nl, l.size() - nl);
+		l = std::regex_replace (l, parenthese, "$1 ( $2 )");
 		std::fill(words.begin(), words.end(), 0);
 		words = splitStr(l, " ");
-		splitted.push_back(words);
+		if ( words.size() > 0 )
+			splitted.push_back(words);
 	}
 	return ( splitted );
 }
@@ -107,7 +110,7 @@ void	Lexer::tokenize( std::vector<std::vector<std::string> > const & lines ) {
 
 //Analyze lines by lines
 void	Lexer::lex( void ) {
-	std::vector<std::vector<std::string> >	lines = this->splitStream();
+	std::vector<std::vector<std::string> >	lines = this->filterStream();
 
 	this->tokenize(lines);
 	this->print();
