@@ -42,7 +42,6 @@ int	main( int ac, char **av ) {
 		str = readFile( av[1] );
 	if (str != "") {
 		Lexer	lexer(str);
-//		std::cout << str;
 	}
 	return ( 0 );
 }

@@ -59,6 +59,10 @@ Lexer::splitStr(std::string const &str, std::string const & spl) const {
 	return ( line );
 }
 
+/*
+ * First we need to split the stream into a vector of lines,
+ * then we remove comments, and we only takes words
+*/
 std::vector<std::vector<std::string> >	Lexer::filterStream( void ) const {
 	size_t	nl;
 	std::regex	parenthese("([[:alnum:]]) *\\( *(.*) *\\)");
