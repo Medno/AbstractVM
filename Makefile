@@ -25,7 +25,8 @@ TESTS = $(addprefix tests/, \
 #------All sources------#
 
 SRCS = main.cpp		\
-	   Lexer.cpp
+	   Lexer.cpp	\
+	   Parser.cpp
 
 OBJ += $(addprefix ./$(OBJ_PATH)/, $(SRCS:.cpp=.o))
 
@@ -37,6 +38,7 @@ INC += -I $(INCLUDES)
 HEAD = $(addprefix $(INCLUDES), \
 		IOperand.hpp	\
 		Lexer.hpp		\
+		Parser.hpp		\
 		Types.hpp		\
 )
 
