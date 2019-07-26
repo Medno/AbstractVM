@@ -63,13 +63,13 @@ std::vector<std::vector<std::string> >	Lexer::splitStream( void ) const {
 	std::vector<std::string>	lines;
 	std::vector<std::string>	words;
 	std::vector<std::vector <std::string> >	splitted;
-	std::regex	oParenthese("([[:alnum:]])\\(");
-	std::regex	cParenthese("([[:digit:]])\\)");
-
+	std::regex	oParenthese("([[:alnum:]]) *\\( *(.*) *\\)");
+//	std::regex	cParenthese("([[:digit:]])\\)");
+//i[a-z]\(( +)?([0-9]+)?( +)?\)
 	lines = splitStr(this->_stream, "\n");
 	for (auto&& l : lines) {
-		l = std::regex_replace (l,oParenthese,"$1 ( ");
-		l = std::regex_replace (l,cParenthese,"$1 )");
+		l = std::regex_replace (l,oParenthese,"$1 ( $2 )");
+//		l = std::regex_replace (l,cParenthese,"$1 )");
 		std::fill(words.begin(), words.end(), 0);
 		words = splitStr(l, " ");
 		splitted.push_back(words);
