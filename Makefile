@@ -83,6 +83,8 @@ ifneq ($(NOERR),yes)
 CPP_FLAGS += -Werror
 endif
 
+CPP_FLAGS += -std=c++11
+
 LIBCURSES += -lncurses
 
 ifeq ($(DEV),yes)

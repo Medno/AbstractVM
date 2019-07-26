@@ -5,9 +5,10 @@
 #include <string>
 #include <vector>
 #include <iostream>
+#include <regex>
 
 enum	tokenLabel {
-	PUSH,
+	PUSH = 0,
 	POP,
 	DUMP,
 	ASSERT,
@@ -18,13 +19,17 @@ enum	tokenLabel {
 	MOD,
 	PRINT,
 	EXIT,
-	OPERATOR,
 	O_BRACKET,
 	C_BRACKET,
-	VALUE,
+	INT8,
+	INT16,
+	INT32,
+	FLOAT,
+	DOUBLE,
+	OTHER,
 	N,
 	Z,
-	OTHER
+	VALUE
 };
 
 class Lexer {
@@ -34,17 +39,21 @@ public:
 	Lexer( Lexer const & );
 	Lexer	& operator=( Lexer const & );
 
-	std::vector<std::string>	split( void );
-	void	tokenize( std::vector<std::string> const & );
+	std::vector<std::vector<std::string> >	splitStream( void ) const;
+	void	tokenize( std::vector<std::vector<std::string> > const & );
 	void	lexLine( std::string const & );
 	void	lex( void );
 
 	typedef std::pair<tokenLabel, std::string> tokens;
 
 private:
+	std::vector<std::string>	splitStr( std::string const &, std::string const & ) const;
+	tokens	createSingleToken( std::string const & ) const;
+
 	std::string	_stream;
 	std::vector<std::vector<tokens > >	_tokens;
-	
+	void	print( void );
+	std::vector<std::pair<std::string, tokens > >	_allTokens;
 };
 
 #endif
