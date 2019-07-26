@@ -14,10 +14,13 @@
 
 NAME = avm
 
-TESTS = tests/empty.test tests/oneline.test \
-	tests/oneline_several_str.test tests/several_lines_one_str.test\
-	tests/several_lines_several_str.test tests/instr.test tests/newline.test \
-	tests/digit.test
+TESTS = $(addprefix tests/, \
+	empty.test	\
+	instr.test	\
+	digit.test	\
+	basic.test	\
+	value.test	\
+)
 
 #------All sources------#
 
