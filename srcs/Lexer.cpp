@@ -32,6 +32,7 @@ Lexer	& Lexer::operator=( Lexer const & rhs ) {
 
 void	Lexer::print( void ) {
 	for ( auto&& lines : this->_tokens ) {
+		std::cout << "Line : " << &lines-&this->_tokens[0] + 1 << std::endl;
 		for ( auto&& token : lines ) {
 			std::cout << "Token :\t" << this->_allTokens[token.first].first
 			<< "\tValue:\t" << token.second << std::endl;
@@ -73,36 +74,27 @@ std::vector<std::vector<std::string> >	Lexer::splitStream( void ) const {
 }
 
 Lexer::tokens	Lexer::createSingleToken( std::string const & it ) const {
-	std::vector<Lexer::tokens> tokens = {
-		{PUSH, "push"}, {POP, "pop"}, {DUMP, "dump"}, {ASSERT, "assert"},
-		{ADD, "add"}, {SUB, "sub"}, {MUL, "mul"}, {DIV, "div"}, {MOD, "mod"},
-		{PRINT, "print"}, {EXIT, "exit"}, {O_BRACKET, "("},
-		{C_BRACKET, ")"}, {INT8, "int8"}, {INT16, "int16"}, {INT32, "int32"},
-		{FLOAT, "float"}, {DOUBLE, "double"}//,  "value", "n", "z"
-	};
 	std::regex isInt("-?[[:digit:]]+");
 	std::regex isFloat("-?[[:digit:]]+.[[:digit:]]+");
 
 	for (auto&& t : this->_allTokens) {
 		if (!it.compare(t.second.second))
 			return ( Lexer::tokens(t.second.first, it) );
-		else if ( std::regex_match(it, isInt) ) {
-			std::cout << "HERE" << std::endl;
+		else if ( std::regex_match(it, isInt) )
 			return ( Lexer::tokens(N, it) );
-		}
-		else if ( std::regex_match(it, isFloat) ) {
-			std::cout << "THERE" << std::endl;
+		else if ( std::regex_match(it, isFloat) )
 			return ( Lexer::tokens(Z, it) );
-		}
 	}
 	return ( Lexer::tokens(OTHER, it) );
 }
 
 void	Lexer::tokenize( std::vector<std::vector<std::string> > const & lines ) {
-	std::vector<tokens>	tokenLine;
 
 	for(auto&& l : lines) {
+		std::vector<tokens>	tokenLine;
+//		std::cout << "Treating '" << &l-&lines[0] << "' line..." << std::endl;
 		for(auto&& words : l) {
+//			std::cout << "Treating '" << words << "' word..." << std::endl;
 			tokenLine.push_back(this->createSingleToken(words));
 		}
 		this->_tokens.push_back(tokenLine);
