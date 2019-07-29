@@ -13,10 +13,41 @@ public:
 		public:
 			virtual const char*	what( void ) const throw();
 	};
+	class	WrongNumberOfArgumentsException: public std::exception {
+		public:
+			virtual const char*	what( void ) const throw();
+	};
+	class	InvalidNumberOfInstructionException: public std::exception {
+		public:
+			virtual const char*	what( void ) const throw();
+	};
+	class	OpenBracketMissingException: public std::exception {
+		public:
+			virtual const char*	what( void ) const throw();
+	};
+	class	ClosingBracketMissingException: public std::exception {
+		public:
+			virtual const char*	what( void ) const throw();
+	};
+	class	InvalidNumberValueZException: public std::exception {
+		public:
+			virtual const char*	what( void ) const throw();
+	};
+	class	InvalidNumberValueNException: public std::exception {
+		public:
+			virtual const char*	what( void ) const throw();
+	};
+	class	InvalidInstructionException: public std::exception {
+		public:
+			virtual const char*	what( void ) const throw();
+	};
+
 private:
 	void	_parse( Lexer const & );
 	void	handleSingleInstruction(std::vector<Lexer::tokens> const &);
-	void	notYet(std::vector<Lexer::tokens> const &);
+	void	handlePairInstruction(std::vector<Lexer::tokens> const &);
+	void	handleValueInstruction( std::vector<Lexer::tokens> const & );
+	void	InvalidInstruction( std::vector<Lexer::tokens> const & );
 	void	handleException( int const & i );
 };
 

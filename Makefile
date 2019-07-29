@@ -17,6 +17,7 @@ NAME = avm
 TESTS = $(addprefix tests/, \
 	empty.test	\
 	instr.test	\
+	instr_error.test	\
 	digit.test	\
 	basic.test	\
 	value.test	\

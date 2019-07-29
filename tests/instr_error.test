@@ -5,3 +5,6 @@ assert int8(5) 1
 add 4 
 sub 5 
 mul 6
+push int8(5
+push int8( 6
+push int86 )
