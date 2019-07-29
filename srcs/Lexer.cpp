@@ -30,14 +30,8 @@ Lexer	& Lexer::operator=( Lexer const & rhs ) {
 	return *this;
 }
 
-void	Lexer::print( void ) const {
-	for ( auto&& lines : this->_tokens ) {
-		std::cout << "Line : " << &lines-&this->_tokens[0] + 1 << std::endl;
-		for ( auto&& token : lines ) {
-			std::cout << "Token :\t" << this->_allTokens[token.first].first
-			<< "\tValue:\t" << token.second << std::endl;
-		}
-	}
+std::vector<std::vector<Lexer::tokens> >	Lexer::getTokens( void ) const {
+	return this->_tokens;
 }
 
 std::vector<std::string>
@@ -117,7 +111,21 @@ void	Lexer::lex( void ) {
 	std::vector<std::vector<std::string> >	lines = this->filterStream();
 
 	this->tokenize(lines);
-	this->print();
+	std::cout << *this;
 
 	return ;
 }
+
+std::ostream &	operator<<( std::ostream & o, Lexer const & rhs ) {
+	std::vector< std::vector<Lexer::tokens > >	tokens = rhs.getTokens();
+	for ( auto&& lines : tokens ) {
+		o << "Line : " << &lines-&tokens[0] + 1 << std::endl;
+		for ( auto&& token : lines ) {
+			o << "Token :\t" << rhs._allTokens[token.first].first
+			<< "\tValue:\t" << token.second << "\tToken Value : \t" << token.first << std::endl;
+		}
+	}
+	return (o);
+}
+
+
