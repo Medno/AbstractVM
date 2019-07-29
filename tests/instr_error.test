@@ -1,0 +1,7 @@
+push 1
+pop 2
+dump 3
+assert int8(5) 1
+add 4 
+sub 5 
+mul 6
