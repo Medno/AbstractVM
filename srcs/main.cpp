@@ -1,4 +1,5 @@
 #include "Lexer.hpp"
+#include "Parser.hpp"
 #include <iostream>
 #include <string>
 #include <sstream>
@@ -36,12 +37,10 @@ int	main( int ac, char **av ) {
 	}
 
 	std::string	str;
-	if ( ac == 1 )
-		str = readStdin();
-	else
-		str = readFile( av[1] );
-	if (str != "") {
-		Lexer	lexer(str);
-	}
+	str = ( ac == 1 ) ? readStdin() : readFile( av[1] );
+	if (str == "")
+		return (1);
+	Lexer	lexer(str);
+	Parser	parser(lexer);
 	return ( 0 );
 }
