@@ -39,6 +39,8 @@ public:
 	Lexer	& operator=( Lexer const & );
 
 	typedef std::pair<tokenLabel, std::string> tokens;
+
+	bool	getError( void ) const;
 	std::vector<std::vector<tokens > >	getTokens( void ) const;
 	std::vector<std::pair<std::string, tokens > >	_allTokens;
 	class	UnknownInstructionException: public std::exception {
@@ -55,6 +57,7 @@ private:
 
 	std::string	_stream;
 	std::vector<std::vector<tokens > >	_tokens;
+	bool	_error;
 };
 
 std::ostream &	operator<<( std::ostream &, Lexer const & );

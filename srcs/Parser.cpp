@@ -3,7 +3,7 @@
 /*
  * Canonical form
 */
-Parser::Parser( Lexer const & lexer ) {
+Parser::Parser( Lexer const & lexer ) : _error(lexer.getError()) {
 //	std::cout << "--------------------- Start Parsing... ---------------------"
 //		<< std::endl;
 	this->_parse(lexer);
@@ -13,7 +13,10 @@ Parser::Parser( Parser const & src ) {
 	*this = src;
 	return;
 }
-Parser	& Parser::operator=( Parser const & ) {
+Parser	& Parser::operator=( Parser const & rhs ) {
+	if ( this != &rhs ) {
+		this->_error = rhs._error;
+	}
 	return *this;
 }
 
@@ -62,6 +65,9 @@ void	Parser::handleException( int const & index ) {
 	}
 }
 
+bool	Parser::getError( void ) const {
+	return ( this->_error );
+}
 /*
  * Handling exceptions
 */
@@ -76,7 +82,6 @@ void	Parser::handleValueInstruction( std::vector<Lexer::tokens> const & instr) {
 		throw OpenBracketMissingException();
 	else if ( instr[4].first != C_BRACKET )
 		throw ClosingBracketMissingException();
-	
 	if ( ( instr[1].first == DOUBLE || instr[1].first == FLOAT ) && instr[3].first != Z )
 		throw InvalidNumberValueZException();
 	else if ( ( instr[1].first != DOUBLE && instr[1].first != FLOAT ) && instr[3].first != N)
@@ -93,7 +98,7 @@ void	Parser::handlePairInstruction( std::vector<Lexer::tokens> const & instr) {
 	}
 }
 
-void	Parser::InvalidInstruction( std::vector<Lexer::tokens> const & instr ) {
+void	Parser::invalidInstruction( std::vector<Lexer::tokens> const & instr ) {
 	if ( instr[0].first != OTHER )
 		throw InvalidInstructionException();
 }
@@ -106,7 +111,7 @@ void	Parser::_parse( Lexer const & lexer ) {
 	void	(Parser::*handler[3])( std::vector<Lexer::tokens> const & ) = {
 		&Parser::handleSingleInstruction,
 		&Parser::handlePairInstruction,
-		&Parser::InvalidInstruction,
+		&Parser::invalidInstruction,
 	};
 
 	for (auto&& lines : tokens) {

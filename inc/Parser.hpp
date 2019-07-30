@@ -9,6 +9,7 @@ public:
 	~Parser( void );
 	Parser( Parser const & );
 	Parser	& operator=( Parser const & );
+
 	class	IntructionTooLongException: public std::exception {
 		public:
 			virtual const char*	what( void ) const throw();
@@ -41,13 +42,15 @@ public:
 		public:
 			virtual const char*	what( void ) const throw();
 	};
+	bool	getError( void ) const;
 
 private:
+	bool	_error;
 	void	_parse( Lexer const & );
 	void	handleSingleInstruction(std::vector<Lexer::tokens> const &);
 	void	handlePairInstruction(std::vector<Lexer::tokens> const &);
 	void	handleValueInstruction( std::vector<Lexer::tokens> const & );
-	void	InvalidInstruction( std::vector<Lexer::tokens> const & );
+	void	invalidInstruction( std::vector<Lexer::tokens> const & );
 	void	handleException( int const & i );
 };
 

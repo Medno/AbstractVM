@@ -3,7 +3,7 @@
 /*
  * Canonical form
 */
-Lexer::Lexer( std::string const & input ) : _stream( input ) {
+Lexer::Lexer( std::string const & input ) : _stream( input ), _error(0) {
 	this->_allTokens = {
 		{ "PUSH", {PUSH, "push"} }, { "POP", {POP, "pop"} },
 		{ "DUMP", {DUMP, "dump"} }, { "ASSERT", {ASSERT, "assert"} },
@@ -29,8 +29,11 @@ Lexer::Lexer( Lexer const & src ) {
 }
 
 Lexer	& Lexer::operator=( Lexer const & rhs ) {
-	if ( this != &rhs )
+	if ( this != &rhs ) {
 		this->_stream = rhs._stream;
+		this->_tokens = rhs._tokens;
+		this->_error = rhs._error;
+	}
 	return *this;
 }
 
@@ -41,6 +44,9 @@ const char*	Lexer::UnknownInstructionException::what( void ) const throw() {
 	return "Unknown instruction";
 }
 
+bool	Lexer::getError( void ) const {
+	return this->_error;
+}
 
 std::vector<std::vector<Lexer::tokens> >	Lexer::getTokens( void ) const {
 	return this->_tokens;
@@ -119,10 +125,11 @@ void	Lexer::tokenize( std::vector<std::vector<std::string> > const & lines ) {
 			} catch ( UnknownInstructionException & e ) {
 				std::cout << "Error: Line " << &l-&lines[0] + 1 << ": "
 					<< e.what() << std::endl;
+				_error = 1;
 			}
 		}
 		if ( tokenLine.size() )
-		this->_tokens.push_back(tokenLine);
+			this->_tokens.push_back(tokenLine);
 	}
 }
 
@@ -142,7 +149,8 @@ std::ostream &	operator<<( std::ostream & o, Lexer const & rhs ) {
 		o << "Line : " << &lines-&tokens[0] + 1 << std::endl;
 		for ( auto&& token : lines ) {
 			o << "Token :\t" << rhs._allTokens[token.first].first
-			<< "\tValue:\t" << token.second << "\tToken Value : \t" << token.first << std::endl;
+			<< "\tValue:\t" << token.second << "\tToken Value : \t"
+			<< token.first << std::endl;
 		}
 	}
 	return (o);

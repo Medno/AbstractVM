@@ -42,5 +42,9 @@ int	main( int ac, char **av ) {
 		return (1);
 	Lexer	lexer(str);
 	Parser	parser(lexer);
+	if ( parser.getError() ) {
+		std::cout << "Cannot assemble " << (ac == 1 ? "in stdin" : av[1]) << std::endl;
+		return (1);
+	}
 	return ( 0 );
 }
