@@ -3,11 +3,7 @@
 /*
  * Canonical form
 */
-Parser::Parser( Lexer const & lexer ) : _error(lexer.getError()) {
-//	std::cout << "--------------------- Start Parsing... ---------------------"
-//		<< std::endl;
-	this->_parse(lexer);
-}
+Parser::Parser( void ) {}
 Parser::~Parser( void ) {}
 Parser::Parser( Parser const & src ) {
 	*this = src;
@@ -18,6 +14,11 @@ Parser	& Parser::operator=( Parser const & rhs ) {
 		this->_error = rhs._error;
 	}
 	return *this;
+}
+Parser::Parser( Lexer const & lexer ) : _error(lexer.getError()) {
+//	std::cout << "--------------------- Start Parsing... ---------------------"
+//		<< std::endl;
+	this->_parse(lexer);
 }
 
 /*
