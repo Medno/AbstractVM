@@ -1,5 +1,7 @@
 #include "Lexer.hpp"
 #include "Parser.hpp"
+#include "Operand.hpp"
+
 #include <iostream>
 #include <string>
 #include <sstream>
@@ -46,5 +48,9 @@ int	main( int ac, char **av ) {
 		std::cout << "Cannot assemble " << (ac == 1 ? "in stdin" : av[1]) << std::endl;
 		return (1);
 	}
+	Operand<int>	a(5, "5");
+	Operand<float>	b(5.2, "5.2");
+	const IOperand	*res = a + b;
+	std::cout << res->toString() << std::endl;
 	return ( 0 );
 }
