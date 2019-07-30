@@ -26,10 +26,9 @@ enum	tokenLabel {
 	INT32,
 	FLOAT,
 	DOUBLE,
-	OTHER,
 	N,
 	Z,
-	VALUE
+	OTHER
 };
 
 class Lexer {
@@ -42,6 +41,11 @@ public:
 	typedef std::pair<tokenLabel, std::string> tokens;
 	std::vector<std::vector<tokens > >	getTokens( void ) const;
 	std::vector<std::pair<std::string, tokens > >	_allTokens;
+	class	UnknownInstructionException: public std::exception {
+		public:
+			virtual const char*	what( void ) const throw();
+	};
+
 private:
 	void	lex( void );
 	tokens	createSingleToken( std::string const & ) const;
