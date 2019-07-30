@@ -4,8 +4,8 @@
  * Canonical form
 */
 Parser::Parser( Lexer const & lexer ) {
-	std::cout << "--------------------- Start Parsing... ---------------------"
-		<< std::endl;
+//	std::cout << "--------------------- Start Parsing... ---------------------"
+//		<< std::endl;
 	this->_parse(lexer);
 }
 Parser::~Parser( void ) {}
@@ -93,8 +93,9 @@ void	Parser::handlePairInstruction( std::vector<Lexer::tokens> const & instr) {
 	}
 }
 
-void	Parser::InvalidInstruction( std::vector<Lexer::tokens> const & ) {
-	throw InvalidInstructionException();
+void	Parser::InvalidInstruction( std::vector<Lexer::tokens> const & instr ) {
+	if ( instr[0].first != OTHER )
+		throw InvalidInstructionException();
 }
 
 void	Parser::_parse( Lexer const & lexer ) {
