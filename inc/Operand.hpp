@@ -2,57 +2,74 @@
 # define OPERAND_HPP
 
 #include "IOperand.hpp"
+#include <iostream>
 #include <cmath>
+#include "OperandFactory.hpp"
 
 template<typename T>
 class Operand : public IOperand {
 public:
-	Operand( T value, std::string str ) : _value(value), _str(str) {}
+	Operand( T v, std::string const & s, eOperandType t ) : value(v), str(s), type(t) {
+		std::cout << "LAST : " << str << '\n';
+		this->precision = static_cast<int>(t);
+	}
 	~Operand( void ) {}
 	Operand( Operand const & src ) { *this = src; }
 	Operand	& operator=( Operand const & ) { return *this; }
 
-	int				getPrecision( void ) const { return ( this->_precision ); }
-	eOperandType	getType( void ) const { return ( this->_type ); }
+	int				getPrecision( void ) const { return ( this->precision ); }
+	eOperandType	getType( void ) const { return ( this->type ); }
 
 	virtual IOperand const * operator+( IOperand const & rhs ) const {
-		std::cout << this->_value << std::endl;
-		std::cout << static_cast<T>(stod(rhs.toString())) << std::endl;
-		T	value = this->_value + static_cast<T>(stod(rhs.toString()));
+		T	value = this->value + static_cast<T>(stod(rhs.toString()));
 		const std::string	toStr = std::to_string(value);
-		std::cout << toStr << std::endl;
-		return new Operand<T>( value, toStr );
+		eOperandType	newType = this->precision > rhs.getPrecision()
+		? this->type
+		: rhs.getType();
+		std::cout << toStr << '\n';
+		return OperandFactory::getOp()->createOperand( newType, toStr );
 	}
 	virtual IOperand const * operator-( IOperand const & rhs ) const {
-		T	value = this->_value - static_cast<T>(stod(rhs.toString()));
+		T	value = this->value - static_cast<T>(stod(rhs.toString()));
 		std::string	toStr = std::to_string(value);
-		return new Operand( value, toStr );
+		eOperandType	newType = this->precision > rhs.getPrecision()
+		? this->type
+		: rhs.getType();
+		return OperandFactory::getOp()->createOperand( newType, toStr );
 	}
 	virtual IOperand const * operator*( IOperand const & rhs ) const {
-		T	value = this->_value * static_cast<T>(stod(rhs.toString()));
+		T	value = this->value * static_cast<T>(stod(rhs.toString()));
 		std::string	toStr = std::to_string(value);
-		return new Operand( value, toStr );
+		eOperandType	newType = this->precision > rhs.getPrecision()
+		? this->type
+		: rhs.getType();
+		return OperandFactory::getOp()->createOperand( newType, toStr );
 	}
 	virtual IOperand const * operator/( IOperand const & rhs ) const {
-		T	value = this->_value / static_cast<T>(stod(rhs.toString()));
+		T	value = this->value / static_cast<T>(stod(rhs.toString()));
 		std::string	toStr = std::to_string(value);
-		return new Operand( value, toStr );
+		eOperandType	newType = this->precision > rhs.getPrecision()
+		? this->type
+		: rhs.getType();
+		return OperandFactory::getOp()->createOperand( newType, toStr );
 	}
 	virtual IOperand const * operator%( IOperand const & rhs ) const {
-		T	value = std::fmod(this->_value, static_cast<T>(stod(rhs.toString())));
+		T	value = std::fmod(this->value, static_cast<T>(stod(rhs.toString())));
 		std::string	toStr = std::to_string(value);
-		return new Operand( value, toStr );
+		eOperandType	newType = this->precision > rhs.getPrecision()
+		? this->type
+		: rhs.getType();
+		return OperandFactory::getOp()->createOperand( newType, toStr );
 	}
 
-	std::string const & toString( void ) const { return ( this->_str ); }
-	T	getValue( void ) const { return (this->_value); }
+	std::string const & toString( void ) const { std::cout << "Str : " << this->str << '\n' << "Val: " << this->value << "\nend\n"; return ( this->str ); }
+	T	getValue( void ) const { return (this->value); }
 
 private:
-	T				_value;
-	int				_precision;
-	eOperandType	_type;
-	std::string const &	_str;
-
+	T				value;
+	int				precision;
+	std::string const &	str;
+	eOperandType	type;
 };
 
 #endif

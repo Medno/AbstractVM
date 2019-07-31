@@ -1,4 +1,5 @@
 #include "OperandFactory.hpp"
+#include "Operand.hpp"
 
 /*
  * Canonical form
@@ -12,10 +13,10 @@ OperandFactory::OperandFactory( void ) {
 }
 
 OperandFactory::~OperandFactory( void ) {
-	this->factory_map.clear();
+	this->fMap.clear();
 }
 OperandFactory::OperandFactory( OperandFactory const & ) {}
-OperandFactory	& OperandFactory::operator=( OperandFactory const & rhs ) { return *this; }
+OperandFactory	& OperandFactory::operator=( OperandFactory const & ) { return *this; }
 
 void	OperandFactory::registerOperand( eOperandType type, OperandFactory::memberPtr ptr ) {
 	this->fMap[type] = ptr;
@@ -23,10 +24,11 @@ void	OperandFactory::registerOperand( eOperandType type, OperandFactory::memberP
 
 IOperand const *
 OperandFactory::createOperand(eOperandType type, std::string const & value ) const {
-	OperandFactory::factoryMap::iterator	it = fMap.find(type);
-	if ( it == fMap.end() )
+	std::cout << "DEBUG : " << value << '\n';
+	OperandFactory::factoryMap::const_iterator	it = this->fMap.find(type);
+	if ( it == this->fMap.end() )
 		return NULL;
-	return it->second;
+	return (*this.*it->second)(value);
 }
 
 OperandFactory *	OperandFactory::getOp( void ) {
@@ -36,12 +38,18 @@ OperandFactory *	OperandFactory::getOp( void ) {
 
 IOperand const *
 OperandFactory::createInt8( std::string const & value ) const {
-	int8_t	converted;
+	int		toCast;
 
 	try {
-		converted = boost::lexical_cast<int8_t>(value);
-		return new Operand<int8_t>( converted, value );
-	} catch ( boost::bad_lexical_cast const &e ) {
+		std::cout << "DEBUG : " << value << '\n';
+		if ( (toCast = std::stoi(value)) > INT8_MAX || toCast < INT8_MIN )
+			throw std::out_of_range("Out of range");
+		std::cout << "DEBUG : toCast |" << toCast << "|\n";
+		std::cout << "DEBUG : Casted |" << static_cast<char>(toCast) << "|\n";
+		std::cout << "DEBUG : Casted |" << static_cast<int8_t>(toCast) << "|\n";
+		std::cout << "DEBUG : Casted |" << static_cast<int16_t>(toCast) << "|\n";
+		return new Operand<int8_t>( static_cast<int8_t>(toCast), value, Int8 );
+	} catch ( std::out_of_range const &e ) {
 		std::cout << e.what() << '\n';
 	}
 	return NULL;
@@ -49,12 +57,13 @@ OperandFactory::createInt8( std::string const & value ) const {
 
 IOperand const *
 OperandFactory::createInt16( std::string const & value ) const {
-	int16_t	converted;
+	int		toCast;
 
 	try {
-		converted = boost::lexical_cast<int16_t>(value);
-		return new Operand<int16_t>( converted, value );
-	} catch ( boost::bad_lexical_cast const &e ) {
+		if ( (toCast = std::stoi(value)) > INT16_MAX || toCast < INT16_MIN )
+			throw std::out_of_range("Out of range");
+		return new Operand<int16_t>( static_cast<int16_t>(toCast), value, Int16 );
+	} catch ( std::out_of_range const &e ) {
 		std::cout << e.what() << '\n';
 	}
 	return NULL;
@@ -62,12 +71,13 @@ OperandFactory::createInt16( std::string const & value ) const {
 
 IOperand const *
 OperandFactory::createInt32( std::string const & value ) const {
-	int32_t	converted;
+	int		toCast;
 
 	try {
-		converted = boost::lexical_cast<int32_t>(value);
-		return new Operand<int32_t>( converted, value );
-	} catch ( boost::bad_lexical_cast const &e ) {
+		if ( (toCast = std::stoi(value)) > INT32_MAX || toCast < INT32_MIN )
+			throw std::out_of_range("Out of range");
+		return new Operand<int32_t>( static_cast<int32_t>(toCast), value, Int32 );
+	} catch ( std::out_of_range const &e ) {
 		std::cout << e.what() << '\n';
 	}
 	return NULL;
@@ -78,9 +88,11 @@ OperandFactory::createFloat( std::string const & value ) const {
 	float	converted;
 
 	try {
-		converted = boost::lexical_cast<float>(value);
-		return new Operand<float>( converted, value );
-	} catch ( boost::bad_lexical_cast const &e ) {
+		if ( (converted = std::stof(value)) > std::numeric_limits<float>::max()
+			|| converted < std::numeric_limits<float>::min() )
+			throw std::out_of_range("Out of range");
+		return new Operand<float>( converted, value, Float );
+	} catch ( std::out_of_range const &e ) {
 		std::cout << e.what() << '\n';
 	}
 	return NULL;
@@ -91,9 +103,9 @@ OperandFactory::createDouble( std::string const & value ) const {
 	double	converted;
 
 	try {
-		converted = boost::lexical_cast<double>(value);
-		return new Operand<double>( converted, value );
-	} catch ( boost::bad_lexical_cast const &e ) {
+		converted = converted = std::stod(value);
+		return new Operand<double>( converted, value, Double );
+	} catch ( std::out_of_range const &e ) {
 		std::cout << e.what() << '\n';
 	}
 	return NULL;

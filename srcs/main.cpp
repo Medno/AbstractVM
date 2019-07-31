@@ -2,6 +2,7 @@
 #include "Parser.hpp"
 #include "Operand.hpp"
 
+#include "OperandFactory.hpp"
 #include <iostream>
 #include <string>
 #include <sstream>
@@ -48,9 +49,13 @@ int	main( int ac, char **av ) {
 		std::cout << "Cannot assemble " << (ac == 1 ? "in stdin" : av[1]) << std::endl;
 		return (1);
 	}
-	Operand<int>	a(5, "5");
-	Operand<float>	b(5.2, "5.2");
-	const IOperand	*res = a + b;
-	std::cout << res->toString() << std::endl;
+	const IOperand	*a = OperandFactory::getOp()->createOperand(Int8, "45");
+	const IOperand	*b = OperandFactory::getOp()->createOperand(Int8, "16");
+	std::cout << a->toString() << std::endl;
+	std::cout << b->toString() << std::endl;
+	const IOperand	*res = *a + *b;
+	std::cout << a->toString() << '\n';
+	std::cout << b->toString() << '\n';
+	std::cout << res->toString() << '\n';
 	return ( 0 );
 }

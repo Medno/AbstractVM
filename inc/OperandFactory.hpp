@@ -1,9 +1,8 @@
 #ifndef OPERANDFACTORY_HPP
 #define OPERANDFACTORY_HPP
 
-#include <boost/lexical_cast.hpp>
 #include "IOperand.hpp"
-#include "Operand.hpp"
+#include <map>
 
 class OperandFactory {
 private:
@@ -11,8 +10,8 @@ private:
 	OperandFactory( OperandFactory const & );
 	OperandFactory & operator=( OperandFactory const & );
 
-	typedef void ( OperandFactory::*memberPtr )( std::string const & );
-	typedef std::map	factoryMap;
+	typedef IOperand const * ( OperandFactory::*memberPtr )( std::string const & ) const;
+	typedef std::map<eOperandType, memberPtr>	factoryMap;
 	factoryMap	fMap;
 
 	IOperand const * createInt8( std::string const & value ) const;
