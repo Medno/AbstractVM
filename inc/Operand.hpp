@@ -45,7 +45,6 @@ public:
 	}
 
 	std::string const & toString( void ) const { return ( this->_str ); }
-	IOperand const * createOperand( eOperandType type, std::string const & value ) const;
 	T	getValue( void ) const { return (this->_value); }
 
 private:
@@ -54,11 +53,6 @@ private:
 	eOperandType	_type;
 	std::string const &	_str;
 
-	IOperand const * createInt8( std::string const & value ) const;
-	IOperand const * createInt16( std::string const & value ) const;
-	IOperand const * createInt32( std::string const & value ) const;
-	IOperand const * createFloat( std::string const & value ) const;
-	IOperand const * createDouble( std::string const & value ) const;
 };
 
 #endif
