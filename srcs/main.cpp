@@ -1,5 +1,6 @@
 #include "Lexer.hpp"
 #include "Parser.hpp"
+#include "Execution.hpp"
 #include "Operand.hpp"
 
 #include "OperandFactory.hpp"
@@ -49,13 +50,6 @@ int	main( int ac, char **av ) {
 		std::cout << "Cannot assemble " << (ac == 1 ? "in stdin" : av[1]) << std::endl;
 		return (1);
 	}
-	const IOperand	*a = OperandFactory::getOp()->createOperand(Int8, "45");
-	const IOperand	*b = OperandFactory::getOp()->createOperand(Int8, "16");
-	std::cout << a->toString() << std::endl;
-	std::cout << b->toString() << std::endl;
-	const IOperand	*res = *a + *b;
-	std::cout << a->toString() << '\n';
-	std::cout << b->toString() << '\n';
-	std::cout << res->toString() << '\n';
+	Execution	execution(lexer);
 	return ( 0 );
 }

@@ -6,7 +6,7 @@
 #    By: pchadeni <marvin@42.fr>                    +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2018/01/08 14:57:58 by pchadeni          #+#    #+#              #
-#    Updated: 2019/07/31 11:57:52 by pchadeni         ###   ########.fr        #
+#    Updated: 2019/08/01 15:46:30 by pchadeni         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -28,6 +28,7 @@ TESTS = $(addprefix tests/, \
 SRCS = main.cpp		\
 	   Lexer.cpp	\
 	   Parser.cpp	\
+	   Execution.cpp	\
 	   OperandFactory.cpp
 
 OBJ += $(addprefix ./$(OBJ_PATH)/, $(SRCS:.cpp=.o))
@@ -41,6 +42,7 @@ HEAD = $(addprefix $(INCLUDES), \
 		IOperand.hpp	\
 		Lexer.hpp		\
 		Parser.hpp		\
+		Execution.hpp	\
 		Operand.hpp		\
 		OperandFactory.hpp		\
 )

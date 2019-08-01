@@ -10,65 +10,96 @@ template<typename T>
 class Operand : public IOperand {
 public:
 	Operand( T v, std::string const & s, eOperandType t ) : value(v), str(s), type(t) {
-		std::cout << "LAST : " << str << '\n';
+		std::cout << "LAST : " << this->str << '\n';
+		std::cout << "LAST VALUE: " << this->value << '\n';
 		this->precision = static_cast<int>(t);
 	}
 	~Operand( void ) {}
 	Operand( Operand const & src ) { *this = src; }
 	Operand	& operator=( Operand const & ) { return *this; }
 
+	std::string const & toString( void ) const { return ( this->str ); }
 	int				getPrecision( void ) const { return ( this->precision ); }
 	eOperandType	getType( void ) const { return ( this->type ); }
+	T	getValue( void ) const { return ( this->value ); }
+
+	IOperand const *castOperator( eOperandType type, double res ) const {
+		std::cout << "Type : " << type << '\n';
+		if (type == 0 && res <= INT8_MAX && res >= INT8_MIN)
+			return OperandFactory::getOp()->createOperand( type,
+					std::to_string(static_cast<int8_t>(res)));
+		else if (type == 1 && res <= INT16_MAX && res >= INT16_MIN)
+			return OperandFactory::getOp()->createOperand( type,
+					std::to_string(static_cast<int16_t>(res)));
+		else if (type == 2 && res <= INT32_MAX && res >= INT32_MIN)
+			return OperandFactory::getOp()->createOperand( type,
+					std::to_string(static_cast<int32_t>(res)));
+		else if (type == 3 && res <= std::numeric_limits<float>::max()
+				&& res >= std::numeric_limits<float>::min() )
+			return OperandFactory::getOp()->createOperand( type,
+					std::to_string(static_cast<float>(res)));
+		else if (type == 4)
+			return OperandFactory::getOp()->createOperand( type,
+					std::to_string(res));
+		throw std::out_of_range("Out of range");
+	}
 
 	virtual IOperand const * operator+( IOperand const & rhs ) const {
-		T	value = this->value + static_cast<T>(stod(rhs.toString()));
-		const std::string	toStr = std::to_string(value);
+		double res = stod(this->toString()) + stod(rhs.toString());
 		eOperandType	newType = this->precision > rhs.getPrecision()
-		? this->type
-		: rhs.getType();
-		std::cout << toStr << '\n';
-		return OperandFactory::getOp()->createOperand( newType, toStr );
+			? this->type
+			: rhs.getType();
+		return this->castOperator(newType, res);
 	}
 	virtual IOperand const * operator-( IOperand const & rhs ) const {
-		T	value = this->value - static_cast<T>(stod(rhs.toString()));
-		std::string	toStr = std::to_string(value);
+		double res = stod(this->toString()) - stod(rhs.toString());
 		eOperandType	newType = this->precision > rhs.getPrecision()
-		? this->type
-		: rhs.getType();
-		return OperandFactory::getOp()->createOperand( newType, toStr );
+			? this->type
+			: rhs.getType();
+		return this->castOperator(newType, res);
 	}
 	virtual IOperand const * operator*( IOperand const & rhs ) const {
-		T	value = this->value * static_cast<T>(stod(rhs.toString()));
-		std::string	toStr = std::to_string(value);
+		double res = stod(this->toString()) * stod(rhs.toString());
 		eOperandType	newType = this->precision > rhs.getPrecision()
-		? this->type
-		: rhs.getType();
-		return OperandFactory::getOp()->createOperand( newType, toStr );
+			? this->type
+			: rhs.getType();
+		return this->castOperator(newType, res);
 	}
 	virtual IOperand const * operator/( IOperand const & rhs ) const {
-		T	value = this->value / static_cast<T>(stod(rhs.toString()));
-		std::string	toStr = std::to_string(value);
+		if (rhs.toString() == "0")
+			throw DivisionByZeroException();
+		double res = stod(this->toString()) + stod(rhs.toString());
 		eOperandType	newType = this->precision > rhs.getPrecision()
-		? this->type
-		: rhs.getType();
-		return OperandFactory::getOp()->createOperand( newType, toStr );
+			? this->type
+			: rhs.getType();
+		return this->castOperator(newType, res);
 	}
 	virtual IOperand const * operator%( IOperand const & rhs ) const {
-		T	value = std::fmod(this->value, static_cast<T>(stod(rhs.toString())));
-		std::string	toStr = std::to_string(value);
+		if (rhs.toString() == "0")
+			throw ModuloByZeroException();
+		double res = std::fmod(stod(this->toString()), stod(rhs.toString()));
 		eOperandType	newType = this->precision > rhs.getPrecision()
 		? this->type
 		: rhs.getType();
-		return OperandFactory::getOp()->createOperand( newType, toStr );
+		return this->castOperator(newType, res);
 	}
-
-	std::string const & toString( void ) const { std::cout << "Str : " << this->str << '\n' << "Val: " << this->value << "\nend\n"; return ( this->str ); }
-	T	getValue( void ) const { return (this->value); }
+	class	ModuloByZeroException: public std::exception {
+		public:
+			virtual const char*	what( void ) const throw() {
+				return "Modulo by 0";
+			}
+	};
+	class	DivisionByZeroException: public std::exception {
+		public:
+			virtual const char*	what( void ) const throw() {
+				return "Division by 0";
+			}
+	};
 
 private:
 	T				value;
 	int				precision;
-	std::string const &	str;
+	std::string const	str;
 	eOperandType	type;
 };
 

@@ -44,10 +44,6 @@ OperandFactory::createInt8( std::string const & value ) const {
 		std::cout << "DEBUG : " << value << '\n';
 		if ( (toCast = std::stoi(value)) > INT8_MAX || toCast < INT8_MIN )
 			throw std::out_of_range("Out of range");
-		std::cout << "DEBUG : toCast |" << toCast << "|\n";
-		std::cout << "DEBUG : Casted |" << static_cast<char>(toCast) << "|\n";
-		std::cout << "DEBUG : Casted |" << static_cast<int8_t>(toCast) << "|\n";
-		std::cout << "DEBUG : Casted |" << static_cast<int16_t>(toCast) << "|\n";
 		return new Operand<int8_t>( static_cast<int8_t>(toCast), value, Int8 );
 	} catch ( std::out_of_range const &e ) {
 		std::cout << e.what() << '\n';
