@@ -5,6 +5,7 @@ Execution::Execution( Lexer const & lexer ) {
 	this->registerHandler(PUSH, &Execution::push);
 	this->registerHandler(POP, &Execution::pop);
 	this->registerHandler(DUMP, &Execution::dump);
+	this->registerHandler(ASSERT, &Execution::m_assert);
 	this->registerHandler(ADD, &Execution::add);
 	this->registerHandler(SUB, &Execution::sub);
 	this->registerHandler(MUL, &Execution::mul);
@@ -80,7 +81,7 @@ void	Execution::dump( std::vector<Lexer::tokens> const & ) {
 	}
 }
 
-void	Execution::assert( std::vector<Lexer::tokens> const & instr ) {
+void	Execution::m_assert( std::vector<Lexer::tokens> const & instr ) {
 	if ( this->stack.size() < 1 )
 		throw StackLessThanOneException();
 	std::stack<IOperand const *>	copy(this->stack);
