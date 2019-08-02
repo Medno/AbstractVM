@@ -3,6 +3,8 @@
 
 #include "IOperand.hpp"
 #include <map>
+#include <stdexcept>
+#include <sstream>
 
 class OperandFactory {
 private:
@@ -10,6 +12,15 @@ private:
 	OperandFactory( OperandFactory const & );
 	OperandFactory & operator=( OperandFactory const & );
 
+	class	UnderflowException: public std::underflow_error {
+		public:
+			virtual const char*	what( void ) const throw();
+	};
+	class	OverflowException: public std::runtime_error {
+		public:
+			virtual const char*	what( void ) const throw();
+	};
+	void	handleException( std::string const & value ) const;
 	typedef IOperand const * ( OperandFactory::*memberPtr )( std::string const & ) const;
 	typedef std::map<eOperandType, memberPtr>	factoryMap;
 	factoryMap	fMap;

@@ -36,7 +36,7 @@ const char*	Execution::StackLessThanOneException::what( void ) const throw() {
 }
 
 const char*	Execution::InvalidAssertException::what( void ) const throw() {
-	return "Mismatch between values... abort execution";
+	return "Mismatch between operands... abort execution";
 }
 
 const char*	Execution::MissingExitInstruction::what( void ) const throw() {
@@ -84,8 +84,7 @@ void	Execution::dump( std::vector<Lexer::tokens> const & ) {
 void	Execution::m_assert( std::vector<Lexer::tokens> const & instr ) {
 	if ( this->stack.size() < 1 )
 		throw StackLessThanOneException();
-	std::stack<IOperand const *>	copy(this->stack);
-	IOperand const *	popped = copy.top();
+	IOperand const *	popped = this->stack.top();
 	if ( popped->toString() != instr[3].second )
 		throw InvalidAssertException();
 }
@@ -143,7 +142,7 @@ void	Execution::div( std::vector<Lexer::tokens> const & ) {
 	IOperand const *	second = this->stack.top();
 	this->stack.pop();
 	try {
-		IOperand const *	res = *first / *second;
+		IOperand const *	res = *second / *first;
 		this->stack.push( res );
 	} catch ( ... ) {
 		throw;
@@ -158,15 +157,21 @@ void	Execution::mod( std::vector<Lexer::tokens> const & ) {
 	IOperand const *	second = this->stack.top();
 	this->stack.pop();
 	try {
-		IOperand const *	res = *first % *second;
+		IOperand const *	res = *second % *first;
 		this->stack.push( res );
 	} catch ( ... ) {
 		throw;
 	}
 }
 
-void	Execution::print( std::vector<Lexer::tokens> const & ) {}
-//void	Execution::exit( std::vector<Lexer::tokens>const & input );
+void	Execution::print( std::vector<Lexer::tokens> const & ) {
+	if ( this->stack.size() < 1 )
+		throw StackLessThanOneException();
+	IOperand const *	popped = this->stack.top();
+	if ( popped->getType() != Int8 )
+		throw InvalidAssertException();
+	std::cout << std::stoi(popped->toString(), nullptr) << '\n';
+}
 
 void	Execution::handleExecution( Lexer const & lexer ) {
 	std::vector<std::vector<Lexer::tokens > >

@@ -36,14 +36,13 @@ public:
 	void	push( std::vector<Lexer::tokens> const & );
 	void	pop( std::vector<Lexer::tokens> const & );
 	void	dump( std::vector<Lexer::tokens> const & );
-	void	m_assert( std::vector<Lexer::tokens> const &  );
+	void	m_assert( std::vector<Lexer::tokens> const & );
 	void	add( std::vector<Lexer::tokens> const & );
 	void	sub( std::vector<Lexer::tokens> const & );
 	void	mul( std::vector<Lexer::tokens> const & );
 	void	div( std::vector<Lexer::tokens> const & );
 	void	mod( std::vector<Lexer::tokens> const & );
 	void	print( std::vector<Lexer::tokens> const & );
-//	void	exit( std::vector<Lexer::tokens>const & );
 
 	void	handleExecution( Lexer const & lexer );
 private:

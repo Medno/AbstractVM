@@ -18,6 +18,34 @@ OperandFactory::~OperandFactory( void ) {
 OperandFactory::OperandFactory( OperandFactory const & ) {}
 OperandFactory	& OperandFactory::operator=( OperandFactory const & ) { return *this; }
 
+/*
+ * Exception classes
+*/
+const char*	OperandFactory::UnderflowException::what( void ) const throw() {
+	return "Underflow";
+}
+
+const char*	OperandFactory::OverflowException::what( void ) const throw() {
+	return "Overflow";
+}
+void	OperandFactory::handleException( std::string const & value ) const {
+	std::ostringstream	output;
+	output << "Runtime error: Operand creation: ";
+	try {
+		throw;
+	} catch ( OverflowException const &e ) {
+		output << e.what() << '\n';
+	} catch ( UnderflowException const &e ) {
+		output << e.what() << '\n';
+	} catch ( std::out_of_range const &e ) {
+		output << e.what() << '\n';
+	} catch ( std::exception & e ) {
+		output << e.what() << std::endl;
+	}
+	output << " on value : " << value << '\n';
+	std::cout << output.str();
+}
+
 void	OperandFactory::registerOperand( eOperandType type, OperandFactory::memberPtr ptr ) {
 	this->fMap[type] = ptr;
 }
@@ -28,7 +56,13 @@ OperandFactory::createOperand(eOperandType type, std::string const & value ) con
 	OperandFactory::factoryMap::const_iterator	it = this->fMap.find(type);
 	if ( it == this->fMap.end() )
 		return NULL;
-	return (*this.*it->second)(value);
+	try {
+		IOperand const *	newOperand = (*this.*it->second)(value);
+		return newOperand;
+	} catch ( ... ) {
+		this->handleException( value );
+	}
+	return NULL;
 }
 
 OperandFactory *	OperandFactory::getOp( void ) {
@@ -42,11 +76,14 @@ OperandFactory::createInt8( std::string const & value ) const {
 
 	try {
 		std::cout << "DEBUG : " << value << '\n';
-		if ( (toCast = std::stoi(value)) > INT8_MAX || toCast < INT8_MIN )
-			throw std::out_of_range("Out of range");
+		toCast = std::stoi(value);
+		if ( toCast > INT8_MAX) 
+			throw OverflowException();
+		else if ( toCast < INT8_MIN )
+			throw UnderflowException();
 		return new Operand<int8_t>( static_cast<int8_t>(toCast), value, Int8 );
-	} catch ( std::out_of_range const &e ) {
-		std::cout << e.what() << '\n';
+	} catch ( ... ) {
+		throw;
 	}
 	return NULL;
 }
@@ -56,11 +93,14 @@ OperandFactory::createInt16( std::string const & value ) const {
 	int		toCast;
 
 	try {
-		if ( (toCast = std::stoi(value)) > INT16_MAX || toCast < INT16_MIN )
-			throw std::out_of_range("Out of range");
+		toCast = std::stoi(value);
+		if ( toCast > INT16_MAX) 
+			throw OverflowException();
+		else if ( toCast < INT16_MIN )
+			throw UnderflowException();
 		return new Operand<int16_t>( static_cast<int16_t>(toCast), value, Int16 );
-	} catch ( std::out_of_range const &e ) {
-		std::cout << e.what() << '\n';
+	} catch ( ... ) {
+		throw;
 	}
 	return NULL;
 }
@@ -70,11 +110,14 @@ OperandFactory::createInt32( std::string const & value ) const {
 	int		toCast;
 
 	try {
-		if ( (toCast = std::stoi(value)) > INT32_MAX || toCast < INT32_MIN )
-			throw std::out_of_range("Out of range");
+		toCast = std::stoi(value);
+		if ( toCast > INT32_MAX) 
+			throw OverflowException();
+		else if ( toCast < INT32_MIN )
+			throw UnderflowException();
 		return new Operand<int32_t>( static_cast<int32_t>(toCast), value, Int32 );
-	} catch ( std::out_of_range const &e ) {
-		std::cout << e.what() << '\n';
+	} catch ( ... ) {
+		throw;
 	}
 	return NULL;
 }
@@ -84,12 +127,14 @@ OperandFactory::createFloat( std::string const & value ) const {
 	float	converted;
 
 	try {
-		if ( (converted = std::stof(value)) > std::numeric_limits<float>::max()
-			|| converted < std::numeric_limits<float>::min() )
-			throw std::out_of_range("Out of range");
+		converted = std::stof(value);
+		if ( converted > std::numeric_limits<float>::max())
+			throw OverflowException();
+		else if ( converted < std::numeric_limits<float>::min() )
+			throw UnderflowException();
 		return new Operand<float>( converted, value, Float );
-	} catch ( std::out_of_range const &e ) {
-		std::cout << e.what() << '\n';
+	} catch ( ... ) {
+		throw;
 	}
 	return NULL;
 }
@@ -101,8 +146,8 @@ OperandFactory::createDouble( std::string const & value ) const {
 	try {
 		converted = converted = std::stod(value);
 		return new Operand<double>( converted, value, Double );
-	} catch ( std::out_of_range const &e ) {
-		std::cout << e.what() << '\n';
+	} catch ( ... ) {
+		throw;
 	}
 	return NULL;
 }
