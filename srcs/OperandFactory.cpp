@@ -21,26 +21,22 @@ OperandFactory	& OperandFactory::operator=( OperandFactory const & ) { return *t
 /*
  * Exception classes
 */
-const char*	OperandFactory::UnderflowException::what( void ) const throw() {
-	return "Underflow";
-}
+OperandFactory::UnderflowException::UnderflowException( const char * str ) : underflow_error(str) {}
+OperandFactory::OverflowException::OverflowException( const char * str ) : overflow_error(str) {}
 
-const char*	OperandFactory::OverflowException::what( void ) const throw() {
-	return "Overflow";
-}
 void	OperandFactory::handleException( std::string const & value ) const {
 	std::ostringstream	output;
 	output << "Runtime error: Operand creation: ";
 	try {
 		throw;
 	} catch ( OverflowException const &e ) {
-		output << e.what() << '\n';
+		output << e.what();
 	} catch ( UnderflowException const &e ) {
-		output << e.what() << '\n';
+		output << e.what();
 	} catch ( std::out_of_range const &e ) {
-		output << e.what() << '\n';
+		output << e.what();
 	} catch ( std::exception & e ) {
-		output << e.what() << std::endl;
+		output << e.what();
 	}
 	output << " on value : " << value << '\n';
 	std::cout << output.str();
@@ -73,15 +69,17 @@ OperandFactory *	OperandFactory::getOp( void ) {
 IOperand const *
 OperandFactory::createInt8( std::string const & value ) const {
 	int		toCast;
+	std::ostringstream	filtered;
 
 	try {
 		std::cout << "DEBUG : " << value << '\n';
 		toCast = std::stoi(value);
 		if ( toCast > INT8_MAX) 
-			throw OverflowException();
+			throw OverflowException("Overflow on int8 type");
 		else if ( toCast < INT8_MIN )
-			throw UnderflowException();
-		return new Operand<int8_t>( static_cast<int8_t>(toCast), value, Int8 );
+			throw UnderflowException("Underflow on int8 type");
+		filtered << toCast;
+		return new Operand<int8_t>( static_cast<int8_t>(toCast), filtered.str(), Int8 );
 	} catch ( ... ) {
 		throw;
 	}
@@ -91,14 +89,16 @@ OperandFactory::createInt8( std::string const & value ) const {
 IOperand const *
 OperandFactory::createInt16( std::string const & value ) const {
 	int		toCast;
+	std::ostringstream	filtered;
 
 	try {
 		toCast = std::stoi(value);
 		if ( toCast > INT16_MAX) 
-			throw OverflowException();
+			throw OverflowException("Overflow on int16 type");
 		else if ( toCast < INT16_MIN )
-			throw UnderflowException();
-		return new Operand<int16_t>( static_cast<int16_t>(toCast), value, Int16 );
+			throw UnderflowException("Underflow on int16 type");
+		filtered << toCast;
+		return new Operand<int16_t>( static_cast<int16_t>(toCast), filtered.str(), Int16 );
 	} catch ( ... ) {
 		throw;
 	}
@@ -108,14 +108,16 @@ OperandFactory::createInt16( std::string const & value ) const {
 IOperand const *
 OperandFactory::createInt32( std::string const & value ) const {
 	int		toCast;
+	std::ostringstream	filtered;
 
 	try {
 		toCast = std::stoi(value);
 		if ( toCast > INT32_MAX) 
-			throw OverflowException();
+			throw OverflowException("Overflow on int32 type");
 		else if ( toCast < INT32_MIN )
-			throw UnderflowException();
-		return new Operand<int32_t>( static_cast<int32_t>(toCast), value, Int32 );
+			throw UnderflowException("Underflow on int32 type");
+		filtered << toCast;
+		return new Operand<int32_t>( static_cast<int32_t>(toCast), filtered.str(), Int32 );
 	} catch ( ... ) {
 		throw;
 	}
@@ -125,14 +127,16 @@ OperandFactory::createInt32( std::string const & value ) const {
 IOperand const *
 OperandFactory::createFloat( std::string const & value ) const {
 	float	converted;
+	std::ostringstream	filtered;
 
 	try {
 		converted = std::stof(value);
 		if ( converted > std::numeric_limits<float>::max())
-			throw OverflowException();
+			throw OverflowException("Overflow on float type");
 		else if ( converted < std::numeric_limits<float>::min() )
-			throw UnderflowException();
-		return new Operand<float>( converted, value, Float );
+			throw UnderflowException("Underflow on float type");
+		filtered << converted;
+		return new Operand<float>( converted, filtered.str(), Float );
 	} catch ( ... ) {
 		throw;
 	}
@@ -142,10 +146,12 @@ OperandFactory::createFloat( std::string const & value ) const {
 IOperand const *
 OperandFactory::createDouble( std::string const & value ) const {
 	double	converted;
+	std::ostringstream	filtered;
 
 	try {
 		converted = converted = std::stod(value);
-		return new Operand<double>( converted, value, Double );
+		filtered << converted;
+		return new Operand<double>( converted, filtered.str(), Double );
 	} catch ( ... ) {
 		throw;
 	}

@@ -68,7 +68,7 @@ public:
 	virtual IOperand const * operator/( IOperand const & rhs ) const {
 		if (rhs.toString() == "0")
 			throw DivisionByZeroException();
-		double res = stod(this->toString()) + stod(rhs.toString());
+		double res = stod(this->toString()) / stod(rhs.toString());
 		eOperandType	newType = this->precision > rhs.getPrecision()
 			? this->type
 			: rhs.getType();

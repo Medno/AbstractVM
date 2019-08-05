@@ -74,11 +74,13 @@ void	Execution::pop( std::vector<Lexer::tokens> const & ) {
 
 void	Execution::dump( std::vector<Lexer::tokens> const & ) {
 	std::stack<IOperand const *>	copy(this->stack);
+	std::ostringstream out;
 	while ( !copy.empty() ) {
 		IOperand const *	popped = copy.top();
-		std::cout << popped->toString() << '\n';
+		out << popped->toString() << '\n';
 		copy.pop();
 	}
+	std::cout << out.str();
 }
 
 void	Execution::m_assert( std::vector<Lexer::tokens> const & instr ) {
@@ -170,7 +172,7 @@ void	Execution::print( std::vector<Lexer::tokens> const & ) {
 	IOperand const *	popped = this->stack.top();
 	if ( popped->getType() != Int8 )
 		throw InvalidAssertException();
-	std::cout << std::stoi(popped->toString(), nullptr) << '\n';
+	std::cout << static_cast<int8_t>(std::stoi(popped->toString(), nullptr));
 }
 
 void	Execution::handleExecution( Lexer const & lexer ) {

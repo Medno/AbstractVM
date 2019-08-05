@@ -2,8 +2,8 @@
 #include "Parser.hpp"
 #include "Execution.hpp"
 #include "Operand.hpp"
-
 #include "OperandFactory.hpp"
+
 #include <iostream>
 #include <string>
 #include <sstream>
@@ -33,13 +33,27 @@ std::string	readFile( char *file ) {
 	return "";
 }
 
+int	handleOpt( int ac, char **av ) {
+	int opt = 0;
+	int	i = 1;
+	std::vector<std::pair<std::string, std::string>	availablesOpt = {
+		{"i", "interactive"},
+		{"v", "verbose"},
+	};
+
+	while ( i < ac ) {
+		if ( av[0] == '-' ) {
+			
+		}
+	}
+}
 
 int	main( int ac, char **av ) {
-	if (ac > 2) {
+/*	if (ac > 2) {
 		std::cout << "Wrong number of input" << std::endl;
 		return ( 1 );
 	}
-
+*/
 	std::string	str;
 	str = ( ac == 1 ) ? readStdin() : readFile( av[1] );
 	if (str == "")

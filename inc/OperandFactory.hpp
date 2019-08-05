@@ -14,11 +14,11 @@ private:
 
 	class	UnderflowException: public std::underflow_error {
 		public:
-			virtual const char*	what( void ) const throw();
+			UnderflowException(const char *str);
 	};
-	class	OverflowException: public std::runtime_error {
+	class	OverflowException: public std::overflow_error {
 		public:
-			virtual const char*	what( void ) const throw();
+			OverflowException(const char *str);
 	};
 	void	handleException( std::string const & value ) const;
 	typedef IOperand const * ( OperandFactory::*memberPtr )( std::string const & ) const;

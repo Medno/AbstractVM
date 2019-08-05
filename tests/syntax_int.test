@@ -1,0 +1,5 @@
+push int8(042)
+push int16(0420)
+push int32(04200)
+dump
+exit
