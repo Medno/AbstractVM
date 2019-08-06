@@ -1,3 +1,4 @@
+#include "Options.hpp"
 #include "Lexer.hpp"
 #include "Parser.hpp"
 #include "Execution.hpp"
@@ -29,41 +30,38 @@ std::string	readFile( char *file ) {
 		return ( ss.str() );
 	}
 	else
-		std::cout << "Cannot open " << file << std::endl;
+		std::cout << "AVM: Cannot open " << file << std::endl;
 	return "";
 }
 
-int	handleOpt( int ac, char **av ) {
-	int opt = 0;
-	int	i = 1;
-	std::vector<std::pair<std::string, std::string>	availablesOpt = {
-		{"i", "interactive"},
-		{"v", "verbose"},
-	};
-
-	while ( i < ac ) {
-		if ( av[0] == '-' ) {
-			
-		}
-	}
-}
-
 int	main( int ac, char **av ) {
-/*	if (ac > 2) {
-		std::cout << "Wrong number of input" << std::endl;
-		return ( 1 );
+	int		index;
+	Options	options;
+
+	try {
+		options.handleOpt( ac, av, &index );
+	} catch ( Options::UnknownOptionException & e ) {
+		std::cout << "AVM : " << e.what() << ": " << av[index] << '\n';
+		options.displayUsage();
+		return (1);
 	}
-*/
+
+	if ( index < ac - 1 ) {
+		std::cout << "AVM: Wrong number of input" << '\n';
+		options.displayUsage();
+		return (1);
+	}
+
 	std::string	str;
-	str = ( ac == 1 ) ? readStdin() : readFile( av[1] );
+	str = ( index == ac ) ? readStdin() : readFile( av[index] );
 	if (str == "")
 		return (1);
 	Lexer	lexer(str);
 	Parser	parser(lexer);
 	if ( parser.getError() ) {
-		std::cout << "Cannot assemble " << (ac == 1 ? "in stdin" : av[1]) << std::endl;
+		std::cout << "AVM: Cannot assemble " << (ac == 1 ? "in stdin" : av[1]) << std::endl;
 		return (1);
 	}
 	Execution	execution(lexer);
-	return ( 0 );
+	return (0);
 }

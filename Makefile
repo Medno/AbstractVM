@@ -26,6 +26,7 @@ TESTS = $(addprefix tests/, \
 #------All sources------#
 
 SRCS = main.cpp		\
+	   Options.cpp	\
 	   Lexer.cpp	\
 	   Parser.cpp	\
 	   Execution.cpp	\
@@ -40,6 +41,7 @@ INC += -I $(INCLUDES)
 
 HEAD = $(addprefix $(INCLUDES), \
 		IOperand.hpp	\
+		Options.hpp	\
 		Lexer.hpp		\
 		Parser.hpp		\
 		Execution.hpp	\
