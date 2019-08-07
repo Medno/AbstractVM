@@ -45,6 +45,9 @@ Lexer::Lexer( std::string const & input, Options const & opts )
 	this->registerToken(N, "");
 	this->registerToken(Z, "");
 	this->registerToken(OTHER, "");
+	this->registerToken(AND, "and");
+	this->registerToken(OR, "or");
+	this->registerToken(XOR, "xor");
 	this->lex( opts );
 	return ;
 }

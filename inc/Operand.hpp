@@ -10,8 +10,6 @@ template<typename T>
 class Operand : public IOperand {
 public:
 	Operand( T v, std::string const & s, eOperandType t ) : value(v), str(s), type(t) {
-		std::cout << "LAST : " << this->str << '\n';
-		std::cout << "LAST VALUE: " << this->value << '\n';
 		this->precision = static_cast<int>(t);
 	}
 	~Operand( void ) {}
@@ -23,8 +21,7 @@ public:
 	eOperandType	getType( void ) const { return ( this->type ); }
 	T	getValue( void ) const { return ( this->value ); }
 
-	IOperand const *castOperator( eOperandType type, double res ) const {
-		std::cout << "Type : " << type << '\n';
+	static IOperand const *castOperator( eOperandType type, double res ) {
 		if (type == 0 && res <= INT8_MAX && res >= INT8_MIN)
 			return OperandFactory::getOp()->createOperand( type,
 					std::to_string(static_cast<int8_t>(res)));
@@ -49,21 +46,21 @@ public:
 		eOperandType	newType = this->precision > rhs.getPrecision()
 			? this->type
 			: rhs.getType();
-		return this->castOperator(newType, res);
+		return Operand::castOperator(newType, res);
 	}
 	virtual IOperand const * operator-( IOperand const & rhs ) const {
 		double res = stod(this->toString()) - stod(rhs.toString());
 		eOperandType	newType = this->precision > rhs.getPrecision()
 			? this->type
 			: rhs.getType();
-		return this->castOperator(newType, res);
+		return Operand::castOperator(newType, res);
 	}
 	virtual IOperand const * operator*( IOperand const & rhs ) const {
 		double res = stod(this->toString()) * stod(rhs.toString());
 		eOperandType	newType = this->precision > rhs.getPrecision()
 			? this->type
 			: rhs.getType();
-		return this->castOperator(newType, res);
+		return Operand::castOperator(newType, res);
 	}
 	virtual IOperand const * operator/( IOperand const & rhs ) const {
 		if (rhs.toString() == "0")
@@ -72,7 +69,7 @@ public:
 		eOperandType	newType = this->precision > rhs.getPrecision()
 			? this->type
 			: rhs.getType();
-		return this->castOperator(newType, res);
+		return Operand::castOperator(newType, res);
 	}
 	virtual IOperand const * operator%( IOperand const & rhs ) const {
 		if (rhs.toString() == "0")
@@ -81,7 +78,7 @@ public:
 		eOperandType	newType = this->precision > rhs.getPrecision()
 		? this->type
 		: rhs.getType();
-		return this->castOperator(newType, res);
+		return Operand::castOperator(newType, res);
 	}
 	class	ModuloByZeroException: public std::exception {
 		public:

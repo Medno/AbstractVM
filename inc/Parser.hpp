@@ -2,6 +2,7 @@
 # define PARSER_HPP
 
 #include "Lexer.hpp"
+#include "Options.hpp"
 
 class Parser {
 public:
@@ -42,17 +43,21 @@ public:
 		public:
 			virtual const char*	what( void ) const throw();
 	};
+
 	bool	getError( void ) const;
 
 private:
+	typedef void ( Parser::*memberPtr )( std::vector<Lexer::token> const & );
 	Parser( void );
-	bool	_error;
-	void	_parse( Lexer const & );
-	void	handleSingleInstruction(std::vector<Lexer::tokens> const &);
-	void	handlePairInstruction(std::vector<Lexer::tokens> const &);
-	void	handleValueInstruction( std::vector<Lexer::tokens> const & );
-	void	invalidInstruction( std::vector<Lexer::tokens> const & );
+	bool	error;
+	void	registerTokenHandling( tokenLabel, memberPtr );
+	void	parse( Lexer const & );
+	void	handleSingleInstruction(std::vector<Lexer::token> const &);
+	void	handlePairInstruction(std::vector<Lexer::token> const &);
+	void	handleValueInstruction( std::vector<Lexer::token> const & );
+	void	invalidInstruction( std::vector<Lexer::token> const & );
 	void	handleException( int const & i );
+	std::map<tokenLabel, memberPtr>	handler;
 };
 
 #endif

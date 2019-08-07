@@ -15,10 +15,20 @@ Parser	& Parser::operator=( Parser const & rhs ) {
 	}
 	return *this;
 }
-//	std::cout << "--------------------- Start Parsing... ---------------------"
-//		<< std::endl;
-	this->_parse(lexer);
 Parser::Parser( Lexer const & lexer ) : error(lexer.getError()) {
+	this->registerTokenHandling( PUSH, &Parser::handlePairInstruction );
+	this->registerTokenHandling( POP, &Parser::handleSingleInstruction );
+	this->registerTokenHandling( DUMP, &Parser::handleSingleInstruction );
+	this->registerTokenHandling( ASSERT, &Parser::handlePairInstruction );
+	this->registerTokenHandling( ADD, &Parser::handleSingleInstruction );
+	this->registerTokenHandling( SUB, &Parser::handleSingleInstruction );
+	this->registerTokenHandling( MUL, &Parser::handleSingleInstruction );
+	this->registerTokenHandling( DIV, &Parser::handleSingleInstruction );
+	this->registerTokenHandling( PRINT, &Parser::handleSingleInstruction );
+	this->registerTokenHandling( EXIT, &Parser::handleSingleInstruction );
+
+	this->registerTokenHandling( AND, &Parser::handleSingleInstruction );
+	this->parse(lexer);
 }
 
 /*
@@ -106,20 +116,18 @@ void	Parser::invalidInstruction( std::vector<Lexer::token> const & instr ) {
 }
 // End of Error
 
-	std::vector<int>	matcher = {
-		1, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2
-	};
-	void	(Parser::*handler[3])( std::vector<Lexer::tokens> const & ) = {
-		&Parser::handleSingleInstruction,
-		&Parser::handlePairInstruction,
-		&Parser::invalidInstruction,
-	};
+void	Parser::registerTokenHandling( tokenLabel label ,memberPtr ptr ) {
+	this->handler[label] = ptr;
+}
 
 void	Parser::parse( Lexer const & lexer ) {
 	std::vector<std::vector<Lexer::token > >	tokens = lexer.getTokens();
 	for (auto&& lines : tokens) {
 		try {
-			(this->*handler[matcher[lines.front().first]])(lines);
+			if (this->handler.find(lines.front().first) == this->handler.end())
+				this->invalidInstruction(lines);
+			else
+				(this->*handler[lines.front().first])(lines);
 		} catch ( ... ) {
 			handleException( &lines - &tokens[0] );
 		}
