@@ -1,0 +1,4 @@
+push double(3.0)
+push int8(1)
+and
+exit

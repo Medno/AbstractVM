@@ -16,7 +16,7 @@ enum	tokenLabel {
 	ADD, SUB, MUL, DIV, MOD,
 	PRINT, EXIT, O_BRACKET, C_BRACKET,
 	INT8, INT16, INT32, FLOAT, DOUBLE, N, Z, OTHER,
-	AND, OR, XOR
+	AND, OR, XOR, NOT
 };
 
 class Lexer {
@@ -30,7 +30,7 @@ public:
 	typedef std::pair<tokenLabel, std::string> token;
 	std::map<std::string, tokenLabel>	allTokens;
 
-	bool	getError( void ) const;
+	int	getError( void ) const;
 	std::vector<std::vector<token > >	getTokens( void ) const;
 
 	class	UnknownInstructionException: public std::exception {
@@ -50,7 +50,7 @@ private:
 
 	std::string	stream;
 	std::vector<std::vector<token > >	tokens;
-	bool	error;
+	int 	error;
 };
 
 std::ostream &	operator<<( std::ostream &, Lexer const & );

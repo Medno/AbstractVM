@@ -30,7 +30,11 @@ public:
 		public:
 			virtual const char*	what( void ) const throw();
 	};
-	class	MissingExitInstruction: public std::exception {
+	class	MissingExitInstructionException: public std::exception {
+		public:
+			virtual const char*	what( void ) const throw();
+	};
+	class	InstructionOnIntException: public std::exception {
 		public:
 			virtual const char*	what( void ) const throw();
 	};
@@ -48,6 +52,7 @@ public:
 	void	m_and( std::vector<Lexer::token> const & );
 	void	m_or( std::vector<Lexer::token> const & );
 	void	m_xor( std::vector<Lexer::token> const & );
+	void	m_not( std::vector<Lexer::token> const & );
 
 	void	printStack( void ) const;
 	void	handleExecution( Lexer const & lexer );
@@ -57,6 +62,7 @@ private:
 	std::map<tokenLabel, memberPtr>	fMap;
 	void	registerHandler( tokenLabel type, memberPtr ptr );
 	void	printInstruction( std::string const & instr ) const;
+	static bool	isInt( IOperand const * check );
 
 	void	handleException( std::string const & instruction );
 	std::map<tokenLabel, eOperandType>	typeMap;

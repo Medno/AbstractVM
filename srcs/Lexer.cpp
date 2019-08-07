@@ -48,6 +48,7 @@ Lexer::Lexer( std::string const & input, Options const & opts )
 	this->registerToken(AND, "and");
 	this->registerToken(OR, "or");
 	this->registerToken(XOR, "xor");
+	this->registerToken(NOT, "not");
 	this->lex( opts );
 	return ;
 }
@@ -60,7 +61,7 @@ const char*	Lexer::UnknownInstructionException::what( void ) const throw() {
 	return "Unknown instruction";
 }
 
-bool	Lexer::getError( void ) const {
+int	Lexer::getError( void ) const {
 	return this->error;
 }
 // End of Exceptions
@@ -152,9 +153,9 @@ void	Lexer::displayErrors( void ) {
 				if ( token.first == OTHER )
 					throw UnknownInstructionException();
 			} catch ( UnknownInstructionException & e ) {
-				std::cout << "\033[1;31mError\033[0m: Line " << &lines-&this->tokens[0] + 1
-					<< ": " << e.what() << ": " << token.second << '\n';
-				this->error |= 1 << 0;
+				this->error += 1;
+				std::cout << "\033[1;31mError:\033[0m \033[1;37mLine " << &lines-&this->tokens[0] + 1
+					<< ": " << e.what() << ": '" << token.second << "'\033[0m" << '\n';
 			}
 		}
 	}
@@ -194,14 +195,14 @@ static std::string	findLabel( Lexer const & rhs, Lexer::token const & token ) {
 
 std::ostream &	operator<<( std::ostream & o, Lexer const & rhs ) {
 	std::vector< std::vector<Lexer::token > >	t_tokens = rhs.getTokens();
-	o << "\033[1;32m---------------------------- Lexer ----------------------------" << '\n';
+	o << "\033[0;36m---------------------------- Lexer ----------------------------" << '\n';
 	for ( auto&& lines : t_tokens ) {
 		o << "Line : " << &lines-&t_tokens[0] + 1 << std::endl;
 		for ( auto&& token : lines ) {
 			std::string label = findLabel( rhs, token );
 			if (label == "OTHER")
 				o << "\033[0m\033[1;31mToken :\t" << label << "\tValue:\t"
-					<< token.second << "\033[0m\033[1;32m" << '\n';
+					<< token.second << "\033[0m\033[0;36m" << '\n';
 			else
 				o << "Token :\t" << label << "\tValue:\t" << token.second << std::endl;
 		}

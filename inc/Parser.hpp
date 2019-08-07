@@ -44,12 +44,12 @@ public:
 			virtual const char*	what( void ) const throw();
 	};
 
-	bool	getError( void ) const;
+	int	getError( void ) const;
 
 private:
 	typedef void ( Parser::*memberPtr )( std::vector<Lexer::token> const & );
 	Parser( void );
-	bool	error;
+	int		error;
 	void	registerTokenHandling( tokenLabel, memberPtr );
 	void	parse( Lexer const & );
 	void	handleSingleInstruction(std::vector<Lexer::token> const &);

@@ -16,6 +16,7 @@ Execution::Execution( Lexer const & lexer, Options const & option )
 	this->registerHandler(AND, &Execution::m_and);
 	this->registerHandler(OR, &Execution::m_or);
 	this->registerHandler(XOR, &Execution::m_xor);
+	this->registerHandler(NOT, &Execution::m_not);
 //	this->registerHandler(EXIT, &Execution::exit);
 
 	this->typeMap[INT8] = Int8;
@@ -44,17 +45,22 @@ const char*	Execution::InvalidAssertException::what( void ) const throw() {
 	return "Mismatch between operands... abort execution";
 }
 
-const char*	Execution::MissingExitInstruction::what( void ) const throw() {
+const char*	Execution::MissingExitInstructionException::what( void ) const throw() {
 	return "Missing exit instruction... abort execution";
+}
+
+const char*	Execution::InstructionOnIntException::what( void ) const throw() {
+	return "This instruction must take Int{8,16,32} parameters";
 }
 
 void	Execution::handleException( std::string const & instruction ) {
 	try {
-		std::cout << "Runtime error: " << instruction << ": ";
+		std::cout << "\033[1;31mRuntime error:\033[0m \033[1;37m" << instruction << ": ";
 		throw;
 	} catch ( std::exception & e ) {
-		std::cout << e.what() << std::endl;
+		std::cout << e.what();
 	}
+	std::cout << "\033[0m" << '\n';
 }
 
 void	Execution::registerHandler( tokenLabel type, Execution::memberPtr ptr ) {
@@ -200,14 +206,20 @@ void	Execution::printInstruction( std::string const & instr ) const {
 	std::cout << "\033[1m" << instr << " instruction...\033[0m\n";
 }
 
+bool	Execution::isInt( IOperand const * check ) {
+	eOperandType	type = check->getType();
+	return type == Int8 || type == Int16 || type == Int32;
+}
+
 void	Execution::m_and( std::vector<Lexer::token> const & ) {
-	//CHECK IF BOTH VALUES ARE INT
 	if (this->stack.size() < 2)
 		throw StackLessThanTwoException();
 	IOperand const *	first = this->stack.top();
 	this->stack.pop();
 	IOperand const *	second = this->stack.top();
 	this->stack.pop();
+	if ( !Execution::isInt( first ) || !Execution::isInt( second ) )
+		throw InstructionOnIntException();
 	int	res = (stoi(second->toString()) & stoi(first->toString()));
 	eOperandType	newType = first->getType() > second->getType() ?
 		first->getType() : second->getType();
@@ -226,6 +238,8 @@ void	Execution::m_or( std::vector<Lexer::token> const & ) {
 	this->stack.pop();
 	IOperand const *	second = this->stack.top();
 	this->stack.pop();
+	if ( !Execution::isInt( first ) || !Execution::isInt( second ) )
+		throw InstructionOnIntException();
 	int	res = (stoi(second->toString()) | stoi(first->toString()));
 	eOperandType	newType = first->getType() > second->getType() ?
 		first->getType() : second->getType();
@@ -244,6 +258,8 @@ void	Execution::m_xor( std::vector<Lexer::token> const & ) {
 	this->stack.pop();
 	IOperand const *	second = this->stack.top();
 	this->stack.pop();
+	if ( !Execution::isInt( first ) || !Execution::isInt( second ) )
+		throw InstructionOnIntException();
 	int	res = (stoi(second->toString()) ^ stoi(first->toString()));
 	eOperandType	newType = first->getType() > second->getType() ?
 		first->getType() : second->getType();
@@ -255,6 +271,21 @@ void	Execution::m_xor( std::vector<Lexer::token> const & ) {
 	}
 }
 
+void	Execution::m_not( std::vector<Lexer::token> const & ) {
+	if (this->stack.size() < 1)
+		throw StackLessThanOneException();
+	IOperand const *	first = this->stack.top();
+	this->stack.pop();
+	if ( !Execution::isInt( first ) )
+		throw InstructionOnIntException();
+	int	res = (~stoi(first->toString()));
+	try {
+		IOperand const * newOperand = Operand<int>::castOperator(first->getType(), res);
+		this->stack.push( newOperand );
+	} catch ( ... ) {
+		throw;
+	}
+}
 
 void	Execution::handleExecution( Lexer const & lexer ) {
 	std::vector<std::vector<Lexer::token > >
@@ -275,8 +306,8 @@ void	Execution::handleExecution( Lexer const & lexer ) {
 			if ( (this->opt & OPT_VERBOSE) )
 				this->printStack();
 		}
-		throw MissingExitInstruction();
-	} catch ( MissingExitInstruction &e ) {
+		throw MissingExitInstructionException();
+	} catch ( MissingExitInstructionException &e ) {
 		this->handleException( "exit" );
 	}
 }

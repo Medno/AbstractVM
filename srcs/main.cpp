@@ -58,8 +58,10 @@ int	main( int ac, char **av ) {
 		return (1);
 	Lexer	lexer(str, options);
 	Parser	parser(lexer);
-	if ( parser.getError() ) {
-		std::cout << "AVM: Cannot assemble " << (index == ac ? "in stdin" : av[index]) << std::endl;
+	int		errors = parser.getError();
+	if ( errors ) {
+		std::cout << errors << " error" << (errors > 1 ? "s" : "") << " generated." << '\n'
+		<< "AVM: Cannot assemble " << (index == ac ? "in stdin" : av[index]) << std::endl;
 		return (1);
 	}
 	Execution	execution(lexer, options);
