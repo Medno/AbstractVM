@@ -56,10 +56,10 @@ int	main( int ac, char **av ) {
 	str = ( index == ac ) ? readStdin() : readFile( av[index] );
 	if (str == "")
 		return (1);
-	Lexer	lexer(str);
+	Lexer	lexer(str, options);
 	Parser	parser(lexer);
 	if ( parser.getError() ) {
-		std::cout << "AVM: Cannot assemble " << (ac == 1 ? "in stdin" : av[1]) << std::endl;
+		std::cout << "AVM: Cannot assemble " << (index == ac ? "in stdin" : av[index]) << std::endl;
 		return (1);
 	}
 	Execution	execution(lexer);

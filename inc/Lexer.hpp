@@ -1,11 +1,15 @@
 #ifndef LEXER_HPP
 #define LEXER_HPP
 
+#include <map>
 #include <sstream>
 #include <string>
 #include <vector>
 #include <iostream>
 #include <regex>
+#include <algorithm>
+
+#include "Options.hpp"
 
 enum	tokenLabel {
 	PUSH = 0,
@@ -33,23 +37,27 @@ enum	tokenLabel {
 
 class Lexer {
 public:
-	Lexer( std::string const & );
 	~Lexer( void );
 	Lexer( Lexer const & );
 	Lexer	& operator=( Lexer const & );
+
+	Lexer( std::string const &, Options const & );
 
 	typedef std::pair<tokenLabel, std::string> tokens;
 
 	bool	getError( void ) const;
 	std::vector<std::vector<tokens > >	getTokens( void ) const;
-	std::vector<std::pair<std::string, tokens > >	_allTokens;
+	std::map<std::string, tokenLabel>	allTokens;
+
 	class	UnknownInstructionException: public std::exception {
 		public:
 			virtual const char*	what( void ) const throw();
 	};
 
 private:
-	void	lex( void );
+	Lexer( void );
+	void	registerToken( tokenLabel, std::string const & );
+	void	lex( Options const & );
 	tokens	createSingleToken( std::string const & ) const;
 	void	tokenize( std::vector<std::vector<std::string> > const & );
 	std::vector<std::string>			splitStr( std::string const &, std::string const & ) const;

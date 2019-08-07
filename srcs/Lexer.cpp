@@ -3,31 +3,12 @@
 /*
  * Canonical form
 */
-Lexer::Lexer( std::string const & input ) : _stream( input ), _error(0) {
-	this->_allTokens = {
-		{ "PUSH", {PUSH, "push"} }, { "POP", {POP, "pop"} },
-		{ "DUMP", {DUMP, "dump"} }, { "ASSERT", {ASSERT, "assert"} },
-		{ "ADD", {ADD, "add"} }, { "SUB", {SUB, "sub"} },
-		{ "MUL", {MUL, "mul"} }, { "DIV", {DIV, "div"} },
-		{ "MOD", {MOD, "mod"} }, { "PRINT", {PRINT, "print"} },
-		{ "EXIT", {EXIT, "exit"} }, { "O_BRACKET", {O_BRACKET, "("} },
-		{ "C_BRACKET", {C_BRACKET, ")"} }, { "INT8", {INT8, "int8"} },
-		{ "INT16", {INT16, "int16"} }, { "INT32", {INT32, "int32"} },
-		{ "FLOAT", {FLOAT, "float"} }, { "DOUBLE", {DOUBLE, "double"} },
-		{ "N", {N, ""} }, { "Z", {Z, ""} },
-		{ "\x1B[31mOTHER\033[0m", {OTHER, ""} }
-	};
-	this->lex();
-	return ;
-}
-
+Lexer::Lexer( void ) {}
 Lexer::~Lexer( void ) {}
-
 Lexer::Lexer( Lexer const & src ) {
 	*this = src;
 	return ;
 }
-
 Lexer	& Lexer::operator=( Lexer const & rhs ) {
 	if ( this != &rhs ) {
 		this->_stream = rhs._stream;
@@ -38,6 +19,37 @@ Lexer	& Lexer::operator=( Lexer const & rhs ) {
 }
 
 /*
+ * Additionnal constructor
+*/
+
+Lexer::Lexer( std::string const & input, Options const & opts ) : _stream( input ), _error(0) {
+	this->registerToken(PUSH, "push");
+	this->registerToken(POP, "pop");
+	this->registerToken(DUMP, "dump");
+	this->registerToken(ASSERT, "assert");
+	this->registerToken(ADD, "add");
+	this->registerToken(SUB, "sub");
+	this->registerToken(MUL, "mul");
+	this->registerToken(DIV, "div");
+	this->registerToken(MOD, "mod");
+	this->registerToken(PRINT, "print");
+	this->registerToken(EXIT, "exit");
+	this->registerToken(O_BRACKET, "(");
+	this->registerToken(C_BRACKET, ")");
+	this->registerToken(INT8, "int8");
+	this->registerToken(INT16, "int16");
+	this->registerToken(INT32, "int32");
+	this->registerToken(FLOAT, "float");
+	this->registerToken(DOUBLE, "double");
+	this->registerToken(N, "");
+	this->registerToken(Z, "");
+	this->registerToken(OTHER, "");
+	this->lex( opts );
+	return ;
+}
+
+
+/*
  * Exceptions class
 */
 const char*	Lexer::UnknownInstructionException::what( void ) const throw() {
@@ -46,6 +58,11 @@ const char*	Lexer::UnknownInstructionException::what( void ) const throw() {
 
 bool	Lexer::getError( void ) const {
 	return this->_error;
+}
+// End of Exceptions
+
+void	Lexer::registerToken( tokenLabel label, std::string const & value ) {
+	this->allTokens[value] = label;
 }
 
 std::vector<std::vector<Lexer::tokens> >	Lexer::getTokens( void ) const {
@@ -100,14 +117,13 @@ Lexer::tokens	Lexer::createSingleToken( std::string const & it ) const {
 	std::regex isInt("-?[[:digit:]]+");
 	std::regex isFloat("-?[[:digit:]]+.[[:digit:]]+");
 
-	for (auto&& t : this->_allTokens) {
-		if ( !it.compare( t.second.second ) )
-			return ( Lexer::tokens(t.second.first, it) );
-		else if ( std::regex_match(it, isInt) )
-			return ( Lexer::tokens(N, it) );
-		else if ( std::regex_match(it, isFloat) )
-			return ( Lexer::tokens(Z, it) );
-	}
+	std::map<std::string, tokenLabel>::const_iterator	match = this->allTokens.find(it);
+	if ( match != this->allTokens.end())
+		return ( Lexer::tokens(match->second, it) );
+	else if ( std::regex_match(it, isInt) )
+		return ( Lexer::tokens(N, it) );
+	else if ( std::regex_match(it, isFloat) )
+		return ( Lexer::tokens(Z, it) );
 	throw UnknownInstructionException();
 }
 
@@ -134,24 +150,42 @@ void	Lexer::tokenize( std::vector<std::vector<std::string> > const & lines ) {
 }
 
 //Analyze lines by lines
-void	Lexer::lex( void ) {
+void	Lexer::lex( Options const & opts ) {
 	std::vector<std::vector<std::string> >	lines = this->filterStream();
 
 	this->tokenize( lines );
-	std::cout << *this;
+	if ( opts.getEffective() & OPT_VERBOSE )
+		std::cout << *this;
 
 	return ;
 }
 
 std::ostream &	operator<<( std::ostream & o, Lexer const & rhs ) {
 	std::vector< std::vector<Lexer::tokens > >	tokens = rhs.getTokens();
+	o << "---------------------------- Lexer ----------------------------" << '\n';
 	for ( auto&& lines : tokens ) {
 		o << "Line : " << &lines-&tokens[0] + 1 << std::endl;
 		for ( auto&& token : lines ) {
-			o << "Token :\t" << rhs._allTokens[token.first].first
-			<< "\tValue:\t" << token.second << "\tToken Value : \t"
-			<< token.first << std::endl;
+			std::map<std::string, tokenLabel>::const_iterator m = rhs.allTokens.find(token.second);
+			std::string	label;
+			if (m == rhs.allTokens.end()) {
+				switch ( token.first ) {
+					case N:
+						label = "N";
+						break;
+					case Z:
+						label = "Z";
+						break;
+					default:
+						label = "OTHER";
+				}
+			}
+			else 
+				label = m->first;
+			std::transform(label.begin(), label.end(), label.begin(), ::toupper);
+			o << "Token :\t" << label << "\tValue:\t" << token.second << std::endl;
 		}
 	}
+	o << "------------------------- End of Lexer ------------------------" << '\n';
 	return (o);
 }

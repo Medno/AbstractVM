@@ -2,8 +2,8 @@
 
 Options::Options( void ) : effective(0) {
 	this->available = {
-		{"-i", "--interactive"},
-		{"-v", "--verbose"},
+		{ OPT_INTERACTIVE, {"-i", "--interactive"} },
+		{ OPT_VERBOSE, {"-v", "--verbose"} },
 	};
 }
 Options::~Options( void ) {}
@@ -16,15 +16,15 @@ Options &	Options::operator=( Options const & rhs ) {
 
 Options::UnknownOptionException::UnknownOptionException( const char * str ) : invalid_argument(str) {}
 
-int		Options::getEffective( void ) { return this->effective; }
+int		Options::getEffective( void ) const { return this->effective; }
 
 void	Options::displayUsage( void ) {
 	std::ostringstream	out;
 	out << "Usage : avm";
 	for ( auto&& opt : this->available ) {
-		out << " [" << opt.first;
-		if (opt.second != "")
-			out << " | " << opt.second;
+		out << " [" << opt.second.first;
+		if (opt.second.second != "")
+			out << " | " << opt.second.second;
 		out << "]";
 	}
 	out << " [file]";
@@ -40,8 +40,8 @@ void	Options::handleOpt( int ac, char **av, int *i ) {
 		match = 0;
 		std::string	arg(av[*i]);
 		for ( auto&& opt : this->available ) {
-			if ( opt.first == arg || opt.second == arg ) {
-				this->effective |= 1 << (&opt - &this->available[0]);
+			if ( opt.second.first == arg || opt.second.second == arg ) {
+				this->effective |= opt.first;
 				match = 1;
 			}
 		}
@@ -49,6 +49,6 @@ void	Options::handleOpt( int ac, char **av, int *i ) {
 			throw UnknownOptionException("Unknown option");
 		(*i)++;
 	}
-	if (!eoo)
+	if ( !eoo && *i != ac )
 		(*i)++;
 }
