@@ -56,7 +56,7 @@ void	Execution::registerHandler( tokenLabel type, Execution::memberPtr ptr ) {
 	this->fMap[type] = ptr;
 }
 
-void	Execution::push( std::vector<Lexer::tokens> const & instr ) {
+void	Execution::push( std::vector<Lexer::token> const & instr ) {
 	try {
 		IOperand const * newOperand =
 		OperandFactory::getOp()->createOperand(this->typeMap[instr[1].first], instr[3].second);
@@ -66,13 +66,13 @@ void	Execution::push( std::vector<Lexer::tokens> const & instr ) {
 	}
 }
 
-void	Execution::pop( std::vector<Lexer::tokens> const & ) {
+void	Execution::pop( std::vector<Lexer::token> const & ) {
 	if ( this->stack.size() < 1 )
 		throw StackLessThanOneException();
 	this->stack.pop();
 }
 
-void	Execution::dump( std::vector<Lexer::tokens> const & ) {
+void	Execution::dump( std::vector<Lexer::token> const & ) {
 	std::stack<IOperand const *>	copy(this->stack);
 	std::ostringstream out;
 	while ( !copy.empty() ) {
@@ -83,7 +83,7 @@ void	Execution::dump( std::vector<Lexer::tokens> const & ) {
 	std::cout << out.str();
 }
 
-void	Execution::m_assert( std::vector<Lexer::tokens> const & instr ) {
+void	Execution::m_assert( std::vector<Lexer::token> const & instr ) {
 	if ( this->stack.size() < 1 )
 		throw StackLessThanOneException();
 	IOperand const *	popped = this->stack.top();
@@ -91,7 +91,7 @@ void	Execution::m_assert( std::vector<Lexer::tokens> const & instr ) {
 		throw InvalidAssertException();
 }
 
-void	Execution::add( std::vector<Lexer::tokens> const & ) {
+void	Execution::add( std::vector<Lexer::token> const & ) {
 	if ( this->stack.size() < 2 )
 		throw StackLessThanTwoException();
 	IOperand const *	first = this->stack.top();
@@ -106,7 +106,7 @@ void	Execution::add( std::vector<Lexer::tokens> const & ) {
 	}
 }
 
-void	Execution::sub( std::vector<Lexer::tokens> const & ) {
+void	Execution::sub( std::vector<Lexer::token> const & ) {
 	if ( this->stack.size() < 2 )
 		throw StackLessThanTwoException();
 	IOperand const *	first = this->stack.top();
@@ -121,7 +121,7 @@ void	Execution::sub( std::vector<Lexer::tokens> const & ) {
 	}
 }
 
-void	Execution::mul( std::vector<Lexer::tokens> const & ) {
+void	Execution::mul( std::vector<Lexer::token> const & ) {
 	if ( this->stack.size() < 2 )
 		throw StackLessThanTwoException();
 	IOperand const *	first = this->stack.top();
@@ -136,7 +136,7 @@ void	Execution::mul( std::vector<Lexer::tokens> const & ) {
 	}
 }
 
-void	Execution::div( std::vector<Lexer::tokens> const & ) {
+void	Execution::div( std::vector<Lexer::token> const & ) {
 	if ( this->stack.size() < 2 )
 		throw StackLessThanTwoException();
 	IOperand const *	first = this->stack.top();
@@ -151,7 +151,7 @@ void	Execution::div( std::vector<Lexer::tokens> const & ) {
 	}
 }
 
-void	Execution::mod( std::vector<Lexer::tokens> const & ) {
+void	Execution::mod( std::vector<Lexer::token> const & ) {
 	if ( this->stack.size() < 2 )
 		throw StackLessThanTwoException();
 	IOperand const *	first = this->stack.top();
@@ -166,7 +166,7 @@ void	Execution::mod( std::vector<Lexer::tokens> const & ) {
 	}
 }
 
-void	Execution::print( std::vector<Lexer::tokens> const & ) {
+void	Execution::print( std::vector<Lexer::token> const & ) {
 	if ( this->stack.size() < 1 )
 		throw StackLessThanOneException();
 	IOperand const *	popped = this->stack.top();
@@ -176,7 +176,7 @@ void	Execution::print( std::vector<Lexer::tokens> const & ) {
 }
 
 void	Execution::handleExecution( Lexer const & lexer ) {
-	std::vector<std::vector<Lexer::tokens > >
+	std::vector<std::vector<Lexer::token > >
 		tokens = lexer.getTokens();
 	try {
 		for (auto&& instruction : tokens) {

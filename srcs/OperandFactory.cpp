@@ -48,7 +48,6 @@ void	OperandFactory::registerOperand( eOperandType type, OperandFactory::memberP
 
 IOperand const *
 OperandFactory::createOperand(eOperandType type, std::string const & value ) const {
-	std::cout << "DEBUG : " << value << '\n';
 	OperandFactory::factoryMap::const_iterator	it = this->fMap.find(type);
 	if ( it == this->fMap.end() )
 		return NULL;
@@ -72,7 +71,6 @@ OperandFactory::createInt8( std::string const & value ) const {
 	std::ostringstream	filtered;
 
 	try {
-		std::cout << "DEBUG : " << value << '\n';
 		toCast = std::stoi(value);
 		if ( toCast > INT8_MAX) 
 			throw OverflowException("Overflow on int8 type");

@@ -11,9 +11,9 @@ Lexer::Lexer( Lexer const & src ) {
 }
 Lexer	& Lexer::operator=( Lexer const & rhs ) {
 	if ( this != &rhs ) {
-		this->_stream = rhs._stream;
-		this->_tokens = rhs._tokens;
-		this->_error = rhs._error;
+		this->stream = rhs.stream;
+		this->tokens = rhs.tokens;
+		this->error = rhs.error;
 	}
 	return *this;
 }
@@ -22,7 +22,8 @@ Lexer	& Lexer::operator=( Lexer const & rhs ) {
  * Additionnal constructor
 */
 
-Lexer::Lexer( std::string const & input, Options const & opts ) : _stream( input ), _error(0) {
+Lexer::Lexer( std::string const & input, Options const & opts )
+: stream( input ), error(0) {
 	this->registerToken(PUSH, "push");
 	this->registerToken(POP, "pop");
 	this->registerToken(DUMP, "dump");
@@ -57,7 +58,7 @@ const char*	Lexer::UnknownInstructionException::what( void ) const throw() {
 }
 
 bool	Lexer::getError( void ) const {
-	return this->_error;
+	return this->error;
 }
 // End of Exceptions
 
@@ -65,8 +66,8 @@ void	Lexer::registerToken( tokenLabel label, std::string const & value ) {
 	this->allTokens[value] = label;
 }
 
-std::vector<std::vector<Lexer::tokens> >	Lexer::getTokens( void ) const {
-	return this->_tokens;
+std::vector<std::vector<Lexer::token> >	Lexer::getTokens( void ) const {
+	return this->tokens;
 }
 
 std::vector<std::string>
@@ -99,7 +100,7 @@ std::vector<std::vector<std::string> >	Lexer::filterStream( void ) const {
 	std::vector<std::string>	words;
 	std::vector<std::vector <std::string> >	splitted;
 
-	lines = splitStr( this->_stream, "\n" );
+	lines = splitStr( this->stream, "\n" );
 	for ( auto&& l : lines ) {
 		nl = l.find( ";", 0 );
 		if ( nl != std::string::npos )
@@ -113,39 +114,46 @@ std::vector<std::vector<std::string> >	Lexer::filterStream( void ) const {
 	return ( splitted );
 }
 
-Lexer::tokens	Lexer::createSingleToken( std::string const & it ) const {
+Lexer::token	Lexer::createSingleToken( std::string const & it ) const {
 	std::regex isInt("-?[[:digit:]]+");
 	std::regex isFloat("-?[[:digit:]]+.[[:digit:]]+");
 
 	std::map<std::string, tokenLabel>::const_iterator	match = this->allTokens.find(it);
 	if ( match != this->allTokens.end())
-		return ( Lexer::tokens(match->second, it) );
+		return ( Lexer::token(match->second, it) );
 	else if ( std::regex_match(it, isInt) )
-		return ( Lexer::tokens(N, it) );
+		return ( Lexer::token(N, it) );
 	else if ( std::regex_match(it, isFloat) )
-		return ( Lexer::tokens(Z, it) );
-	throw UnknownInstructionException();
+		return ( Lexer::token(Z, it) );
+	return ( Lexer::token(OTHER, it) );
 }
 
 void	Lexer::tokenize( std::vector<std::vector<std::string> > const & lines ) {
-	Lexer::tokens	newToken;
+	Lexer::token	newToken;
 
 	for( auto&& l : lines ) {
-		std::vector<tokens>	tokenLine;
-//		std::cout << "Treating '" << &l-&lines[0] << "' line..." << std::endl;
+		std::vector<token>	tokenLine;
 		for(auto&& words : l) {
-//			std::cout << "Treating '" << words << "' word..." << std::endl;
-			try {
-				newToken = this->createSingleToken( words );
-				tokenLine.push_back( newToken );
-			} catch ( UnknownInstructionException & e ) {
-				std::cout << "Error: Line " << &l-&lines[0] + 1 << ": "
-					<< e.what() << std::endl;
-				_error = 1;
-			}
+			newToken = this->createSingleToken( words );
+			tokenLine.push_back( newToken );
 		}
 		if ( tokenLine.size() )
-			this->_tokens.push_back(tokenLine);
+			this->tokens.push_back(tokenLine);
+	}
+}
+
+void	Lexer::displayErrors( void ) {
+	for ( auto&& lines : this->tokens ) {
+		for ( auto&& token : lines ) {
+			try {
+				if ( token.first == OTHER )
+					throw UnknownInstructionException();
+			} catch ( UnknownInstructionException & e ) {
+				std::cout << "\033[1;31mError\033[0m: Line " << &lines-&this->tokens[0] + 1
+					<< ": " << e.what() << ": " << token.second << '\n';
+				this->error |= 1 << 0;
+			}
+		}
 	}
 }
 
@@ -156,36 +164,45 @@ void	Lexer::lex( Options const & opts ) {
 	this->tokenize( lines );
 	if ( opts.getEffective() & OPT_VERBOSE )
 		std::cout << *this;
-
+	this->displayErrors();
 	return ;
 }
 
-std::ostream &	operator<<( std::ostream & o, Lexer const & rhs ) {
-	std::vector< std::vector<Lexer::tokens > >	tokens = rhs.getTokens();
-	o << "---------------------------- Lexer ----------------------------" << '\n';
-	for ( auto&& lines : tokens ) {
-		o << "Line : " << &lines-&tokens[0] + 1 << std::endl;
-		for ( auto&& token : lines ) {
-			std::map<std::string, tokenLabel>::const_iterator m = rhs.allTokens.find(token.second);
-			std::string	label;
-			if (m == rhs.allTokens.end()) {
-				switch ( token.first ) {
-					case N:
-						label = "N";
-						break;
-					case Z:
-						label = "Z";
-						break;
-					default:
-						label = "OTHER";
-				}
-			}
-			else 
-				label = m->first;
-			std::transform(label.begin(), label.end(), label.begin(), ::toupper);
-			o << "Token :\t" << label << "\tValue:\t" << token.second << std::endl;
+static std::string	findLabel( Lexer const & rhs, Lexer::token const & token ) {
+	std::map<std::string, tokenLabel>::const_iterator m = rhs.allTokens.find(token.second);
+	std::string	label;
+	if (m == rhs.allTokens.end()) {
+		switch ( token.first ) {
+			case N:
+				label = "N";
+				break;
+			case Z:
+				label = "Z";
+				break;
+			default:
+				label = "OTHER";
 		}
 	}
-	o << "------------------------- End of Lexer ------------------------" << '\n';
+	else 
+		label = m->first;
+	std::transform(label.begin(), label.end(), label.begin(), ::toupper);
+	return label;
+}
+
+std::ostream &	operator<<( std::ostream & o, Lexer const & rhs ) {
+	std::vector< std::vector<Lexer::token > >	t_tokens = rhs.getTokens();
+	o << "\033[1;32m---------------------------- Lexer ----------------------------" << '\n';
+	for ( auto&& lines : t_tokens ) {
+		o << "Line : " << &lines-&t_tokens[0] + 1 << std::endl;
+		for ( auto&& token : lines ) {
+			std::string label = findLabel( rhs, token );
+			if (label == "OTHER")
+				o << "\033[0m\033[1;31mToken :\t" << label << "\tValue:\t"
+					<< token.second << "\033[0m\033[1;32m" << '\n';
+			else
+				o << "Token :\t" << label << "\tValue:\t" << token.second << std::endl;
+		}
+	}
+	o << "------------------------- End of Lexer ------------------------\033[0m" << '\n';
 	return (o);
 }

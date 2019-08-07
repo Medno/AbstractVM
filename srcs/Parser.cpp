@@ -11,14 +11,14 @@ Parser::Parser( Parser const & src ) {
 }
 Parser	& Parser::operator=( Parser const & rhs ) {
 	if ( this != &rhs ) {
-		this->_error = rhs._error;
+		this->error = rhs.error;
 	}
 	return *this;
 }
-Parser::Parser( Lexer const & lexer ) : _error(lexer.getError()) {
 //	std::cout << "--------------------- Start Parsing... ---------------------"
 //		<< std::endl;
 	this->_parse(lexer);
+Parser::Parser( Lexer const & lexer ) : error(lexer.getError()) {
 }
 
 /*
@@ -58,8 +58,9 @@ const char*	Parser::InvalidInstructionException::what( void ) const throw() {
 }
 
 void	Parser::handleException( int const & index ) {
+	this->error |= 1 << 1;
 	try {
-		std::cout << "Error: Line " << index + 1 << ": ";
+		std::cout << "\033[1;31mError\033[0m: Line " << index + 1 << ": ";
 		throw;
 	} catch ( std::exception & e ) {
 		std::cout << e.what() << std::endl;
@@ -67,18 +68,18 @@ void	Parser::handleException( int const & index ) {
 }
 
 bool	Parser::getError( void ) const {
-	return ( this->_error );
+	return ( this->error );
 }
 /*
- * Handling exceptions
+ * Handling instructions
 */
 
-void	Parser::handleSingleInstruction( std::vector<Lexer::tokens> const & instr) {
+void	Parser::handleSingleInstruction( std::vector<Lexer::token> const & instr) {
 	if ( instr.size() > 1 )
 		throw IntructionTooLongException();
 }
 
-void	Parser::handleValueInstruction( std::vector<Lexer::tokens> const & instr) {
+void	Parser::handleValueInstruction( std::vector<Lexer::token> const & instr) {
 	if ( instr[2].first != O_BRACKET )
 		throw OpenBracketMissingException();
 	else if ( instr[4].first != C_BRACKET )
@@ -89,7 +90,7 @@ void	Parser::handleValueInstruction( std::vector<Lexer::tokens> const & instr) {
 		throw InvalidNumberValueNException();
 }
 
-void	Parser::handlePairInstruction( std::vector<Lexer::tokens> const & instr) {
+void	Parser::handlePairInstruction( std::vector<Lexer::token> const & instr) {
 	if ( instr.size() != 5 )
 		throw WrongNumberOfArgumentsException();
 	try {
@@ -99,13 +100,12 @@ void	Parser::handlePairInstruction( std::vector<Lexer::tokens> const & instr) {
 	}
 }
 
-void	Parser::invalidInstruction( std::vector<Lexer::tokens> const & instr ) {
+void	Parser::invalidInstruction( std::vector<Lexer::token> const & instr ) {
 	if ( instr[0].first != OTHER )
 		throw InvalidInstructionException();
 }
+// End of Error
 
-void	Parser::_parse( Lexer const & lexer ) {
-	std::vector<std::vector<Lexer::tokens > >	tokens = lexer.getTokens();
 	std::vector<int>	matcher = {
 		1, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2
 	};
@@ -115,6 +115,8 @@ void	Parser::_parse( Lexer const & lexer ) {
 		&Parser::invalidInstruction,
 	};
 
+void	Parser::parse( Lexer const & lexer ) {
+	std::vector<std::vector<Lexer::token > >	tokens = lexer.getTokens();
 	for (auto&& lines : tokens) {
 		try {
 			(this->*handler[matcher[lines.front().first]])(lines);
