@@ -62,6 +62,6 @@ int	main( int ac, char **av ) {
 		std::cout << "AVM: Cannot assemble " << (index == ac ? "in stdin" : av[index]) << std::endl;
 		return (1);
 	}
-	Execution	execution(lexer);
+	Execution	execution(lexer, options);
 	return (0);
 }

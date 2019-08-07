@@ -1,0 +1,4 @@
+push int32(42)
+push int8(2)
+and
+exit

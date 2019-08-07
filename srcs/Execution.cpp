@@ -1,7 +1,8 @@
 #include "Execution.hpp"
 
 Execution::Execution( void ) {}
-Execution::Execution( Lexer const & lexer ) {
+Execution::Execution( Lexer const & lexer, Options const & option )
+: opt(option.getEffective()){
 	this->registerHandler(PUSH, &Execution::push);
 	this->registerHandler(POP, &Execution::pop);
 	this->registerHandler(DUMP, &Execution::dump);
@@ -11,6 +12,10 @@ Execution::Execution( Lexer const & lexer ) {
 	this->registerHandler(MUL, &Execution::mul);
 	this->registerHandler(DIV, &Execution::div);
 	this->registerHandler(PRINT, &Execution::print);
+
+	this->registerHandler(AND, &Execution::m_and);
+	this->registerHandler(OR, &Execution::m_or);
+	this->registerHandler(XOR, &Execution::m_xor);
 //	this->registerHandler(EXIT, &Execution::exit);
 
 	this->typeMap[INT8] = Int8;
@@ -175,6 +180,82 @@ void	Execution::print( std::vector<Lexer::token> const & ) {
 	std::cout << static_cast<int8_t>(std::stoi(popped->toString(), nullptr));
 }
 
+void	Execution::printStack( void ) const {
+	std::stack<IOperand const *>	copy(this->stack);
+	std::ostringstream out;
+
+	out << "\033[1;36mStack: < ";
+	while ( !copy.empty() ) {
+		IOperand const *	popped = copy.top();
+		out << popped->toString();
+		copy.pop();
+		if ( !copy.empty() )
+			out << ", ";
+	}
+	out << " >\033[0m\n";
+	std::cout << out.str();
+}
+
+void	Execution::printInstruction( std::string const & instr ) const {
+	std::cout << "\033[1m" << instr << " instruction...\033[0m\n";
+}
+
+void	Execution::m_and( std::vector<Lexer::token> const & ) {
+	//CHECK IF BOTH VALUES ARE INT
+	if (this->stack.size() < 2)
+		throw StackLessThanTwoException();
+	IOperand const *	first = this->stack.top();
+	this->stack.pop();
+	IOperand const *	second = this->stack.top();
+	this->stack.pop();
+	int	res = (stoi(second->toString()) & stoi(first->toString()));
+	eOperandType	newType = first->getType() > second->getType() ?
+		first->getType() : second->getType();
+	try {
+		IOperand const * newOperand = Operand<int>::castOperator(newType, res);
+		this->stack.push( newOperand );
+	} catch ( ... ) {
+		throw;
+	}
+}
+
+void	Execution::m_or( std::vector<Lexer::token> const & ) {
+	if (this->stack.size() < 2)
+		throw StackLessThanTwoException();
+	IOperand const *	first = this->stack.top();
+	this->stack.pop();
+	IOperand const *	second = this->stack.top();
+	this->stack.pop();
+	int	res = (stoi(second->toString()) | stoi(first->toString()));
+	eOperandType	newType = first->getType() > second->getType() ?
+		first->getType() : second->getType();
+	try {
+		IOperand const * newOperand = Operand<int>::castOperator(newType, res);
+		this->stack.push( newOperand );
+	} catch ( ... ) {
+		throw;
+	}
+}
+
+void	Execution::m_xor( std::vector<Lexer::token> const & ) {
+	if (this->stack.size() < 2)
+		throw StackLessThanTwoException();
+	IOperand const *	first = this->stack.top();
+	this->stack.pop();
+	IOperand const *	second = this->stack.top();
+	this->stack.pop();
+	int	res = (stoi(second->toString()) ^ stoi(first->toString()));
+	eOperandType	newType = first->getType() > second->getType() ?
+		first->getType() : second->getType();
+	try {
+		IOperand const * newOperand = Operand<int>::castOperator(newType, res);
+		this->stack.push( newOperand );
+	} catch ( ... ) {
+		throw;
+	}
+}
+
+
 void	Execution::handleExecution( Lexer const & lexer ) {
 	std::vector<std::vector<Lexer::token > >
 		tokens = lexer.getTokens();
@@ -182,12 +263,17 @@ void	Execution::handleExecution( Lexer const & lexer ) {
 		for (auto&& instruction : tokens) {
 			try {
 				if (instruction[0].first == EXIT)
+					// Catch instruction after exit ? 
 					return ;
+				if (this->opt & OPT_VERBOSE)
+					this->printInstruction(instruction[0].second);
 				(this->*fMap[instruction[0].first])(instruction);
 			} catch ( ... ) {
 				this->handleException( instruction[0].second );
 				return ;
 			}
+			if ( (this->opt & OPT_VERBOSE) )
+				this->printStack();
 		}
 		throw MissingExitInstruction();
 	} catch ( MissingExitInstruction &e ) {
