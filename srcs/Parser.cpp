@@ -31,6 +31,8 @@ Parser::Parser( Lexer const & lexer ) : error(lexer.getError()) {
 	this->registerTokenHandling( OR, &Parser::handleSingleInstruction );
 	this->registerTokenHandling( XOR, &Parser::handleSingleInstruction );
 	this->registerTokenHandling( NOT, &Parser::handleSingleInstruction );
+	this->registerTokenHandling( MIN, &Parser::handleSingleInstruction );
+	this->registerTokenHandling( MAX, &Parser::handleSingleInstruction );
 	this->registerTokenHandling( OTHER, &Parser::invalidInstruction );
 	this->parse(lexer);
 }
@@ -116,7 +118,7 @@ void	Parser::handlePairInstruction( std::vector<Lexer::token> const & instr) {
 }
 
 void	Parser::invalidInstruction( std::vector<Lexer::token> const & instr ) {
-	if ( instr[0].first == OTHER )
+	if ( instr[0].first != OTHER )
 		throw InvalidInstructionException();
 }
 // End of Error

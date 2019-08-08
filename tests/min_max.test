@@ -1,0 +1,12 @@
+push int8(1)
+min
+max
+push float(1.0)
+max
+push float(0.8)
+push double(2020.0)
+push double(40404.0)
+push double(2020.01)
+min
+max
+exit

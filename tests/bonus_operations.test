@@ -1,0 +1,28 @@
+push int8(42)
+push int16(2)
+and
+assert int8(2)
+push int8(85)
+push int32(18)
+and
+assert int32(16)
+or
+assert int8(18)
+push int8(100)
+or
+assert int16(118)
+push int8(9)
+xor
+assert int8(127)
+not
+assert int8(-128)
+push int8(-1)
+mul
+assert int16(128)
+push int16(128)
+add
+assert int16(256)
+push int8(127)
+xor
+assert int16(383)
+exit

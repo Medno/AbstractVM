@@ -53,6 +53,8 @@ public:
 	void	m_or( std::vector<Lexer::token> const & );
 	void	m_xor( std::vector<Lexer::token> const & );
 	void	m_not( std::vector<Lexer::token> const & );
+	void	m_min( std::vector<Lexer::token> const & );
+	void	m_max( std::vector<Lexer::token> const & );
 
 	void	printStack( void ) const;
 	void	handleExecution( Lexer const & lexer );

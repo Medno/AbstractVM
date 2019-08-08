@@ -17,6 +17,8 @@ Execution::Execution( Lexer const & lexer, Options const & option )
 	this->registerHandler(OR, &Execution::m_or);
 	this->registerHandler(XOR, &Execution::m_xor);
 	this->registerHandler(NOT, &Execution::m_not);
+	this->registerHandler(MIN, &Execution::m_min);
+	this->registerHandler(MAX, &Execution::m_max);
 //	this->registerHandler(EXIT, &Execution::exit);
 
 	this->typeMap[INT8] = Int8;
@@ -71,7 +73,8 @@ void	Execution::push( std::vector<Lexer::token> const & instr ) {
 	try {
 		IOperand const * newOperand =
 		OperandFactory::getOp()->createOperand(this->typeMap[instr[1].first], instr[3].second);
-		this->stack.push( newOperand );
+		if ( newOperand )
+			this->stack.push( newOperand );
 	} catch ( ... ) {
 		throw;
 	}
@@ -98,7 +101,9 @@ void	Execution::m_assert( std::vector<Lexer::token> const & instr ) {
 	if ( this->stack.size() < 1 )
 		throw StackLessThanOneException();
 	IOperand const *	popped = this->stack.top();
-	if ( popped->toString() != instr[3].second )
+	IOperand const * newOperand =
+		OperandFactory::getOp()->createOperand(this->typeMap[instr[1].first], instr[3].second);
+	if ( newOperand && popped->toString() != instr[3].second )
 		throw InvalidAssertException();
 }
 
@@ -286,6 +291,41 @@ void	Execution::m_not( std::vector<Lexer::token> const & ) {
 		throw;
 	}
 }
+
+void	Execution::m_min( std::vector<Lexer::token> const & ) {
+	if (this->stack.size() < 1)
+		throw StackLessThanOneException();
+	std::stack<IOperand const *>	copy(this->stack);
+	double	min = stod( copy.top()->toString() );
+	copy.pop();
+
+	while ( !copy.empty() ) {
+		IOperand const *	popped = copy.top();
+		double cmp = stod( popped->toString() );
+		if (cmp < min)
+			min = cmp;
+		copy.pop();
+	}
+	std::cout << min << '\n';
+}
+
+void	Execution::m_max( std::vector<Lexer::token> const & ) {
+	if (this->stack.size() < 1)
+		throw StackLessThanOneException();
+	std::stack<IOperand const *>	copy(this->stack);
+	double	max = stod( copy.top()->toString() );
+	copy.pop();
+
+	while ( !copy.empty() ) {
+		IOperand const *	popped = copy.top();
+		double cmp = stod( popped->toString() );
+		if (cmp > max)
+			max = cmp;
+		copy.pop();
+	}
+	std::cout << max << '\n';
+}
+
 
 void	Execution::handleExecution( Lexer const & lexer ) {
 	std::vector<std::vector<Lexer::token > >

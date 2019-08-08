@@ -26,19 +26,13 @@ OperandFactory::OverflowException::OverflowException( const char * str ) : overf
 
 void	OperandFactory::handleException( std::string const & value ) const {
 	std::ostringstream	output;
-	output << "Runtime error: Operand creation: ";
+	output << "\033[1;31mRuntime error:\033[0m \033[1;37mOperand creation: ";
 	try {
 		throw;
-	} catch ( OverflowException const &e ) {
-		output << e.what();
-	} catch ( UnderflowException const &e ) {
-		output << e.what();
-	} catch ( std::out_of_range const &e ) {
-		output << e.what();
-	} catch ( std::exception & e ) {
+	} catch ( std::exception const &e ) {
 		output << e.what();
 	}
-	output << " on value : " << value << '\n';
+	output << " on value : " << value << "\033[0m" << '\n';
 	std::cout << output.str();
 }
 

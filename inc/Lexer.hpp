@@ -16,7 +16,7 @@ enum	tokenLabel {
 	ADD, SUB, MUL, DIV, MOD,
 	PRINT, EXIT, O_BRACKET, C_BRACKET,
 	INT8, INT16, INT32, FLOAT, DOUBLE, N, Z, OTHER,
-	AND, OR, XOR, NOT
+	AND, OR, XOR, NOT, MIN, MAX
 };
 
 class Lexer {
