@@ -11,7 +11,9 @@ class	Execution {
 public:
 	~Execution( void );
 
-	Execution( Lexer const & , Options const & );
+	Execution( Options const & );
+	void	handleExecution( Lexer const & lexer );
+
 	class	StackLessThanTwoException: public std::exception {
 		public:
 			virtual const char*	what( void ) const throw();
@@ -50,7 +52,6 @@ private:
 	static bool	isInt( IOperand const * check );
 
 	void	printStack( void ) const;
-	void	handleExecution( Lexer const & lexer );
 /*
  *	Instructions
 */

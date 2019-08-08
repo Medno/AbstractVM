@@ -5,7 +5,7 @@ Execution::~Execution( void ) {}
 Execution::Execution( Execution const & src ) { *this = src; }
 Execution &	Execution::operator=( Execution const & ) { return *this; }
 
-Execution::Execution( Lexer const & lexer, Options const & option )
+Execution::Execution( Options const & option )
 : opt(option.getEffective()){
 	this->registerHandler(PUSH, &Execution::push);
 	this->registerHandler(POP, &Execution::pop);
@@ -29,7 +29,6 @@ Execution::Execution( Lexer const & lexer, Options const & option )
 	this->typeMap[INT32] = Int32;
 	this->typeMap[FLOAT] = Float;
 	this->typeMap[DOUBLE] = Double;
-	this->handleExecution( lexer );
 }
 
 /*

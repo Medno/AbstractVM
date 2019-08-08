@@ -10,12 +10,14 @@
 #include <sstream>
 #include <fstream>
 
-std::string	readStdin( void ) {
+std::string	readStdin( int opt ) {
 	std::string			line;
 	std::stringstream	ss;
 
-	while ( std::getline(std::cin, line) && line != ";;")
+	do {
+		std::getline(std::cin, line);
 		ss << line << std::endl;
+	} while ( line != ";;" && !(opt & OPT_INTERACTIVE));
 	return ( ss.str() );
 }
 
@@ -52,18 +54,25 @@ int	main( int ac, char **av ) {
 		return (1);
 	}
 
+	Execution	execution( options );
+
 	std::string	str;
-	str = ( index == ac ) ? readStdin() : readFile( av[index] );
-	if (str == "")
-		return (1);
-	Lexer	lexer(str, options);
-	Parser	parser(lexer);
-	int		errors = parser.getError();
-	if ( errors ) {
-		std::cout << errors << " error" << (errors > 1 ? "s" : "") << " generated." << '\n'
-		<< "AVM: Cannot assemble " << (index == ac ? "in stdin" : av[index]) << std::endl;
-		return (1);
-	}
-	Execution	execution(lexer, options);
+	int	opt = options.getEffective();
+	do {
+		str.clear();
+		str = ( index == ac ) ? readStdin( opt ) : readFile( av[index] );
+		if (str == "\n" && opt & OPT_INTERACTIVE)
+			return (1);
+		Lexer	lexer( str, options );
+		Parser	parser( lexer );
+		int		errors = parser.getError();
+		if ( errors ) {
+			std::cout << errors << " error" << (errors > 1 ? "s" : "") << " generated." << '\n'
+				<< "AVM: Cannot assemble " << (index == ac ? "in stdin" : av[index]) << std::endl;
+			return (1);
+		}
+		execution.handleExecution( lexer );
+		std::cout << "Content |" << str << "|\n";
+	} while ( opt & OPT_INTERACTIVE && str != "exit" && str != "");
 	return (0);
 }
