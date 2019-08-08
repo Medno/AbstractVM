@@ -22,8 +22,6 @@ enum	tokenLabel {
 class Lexer {
 public:
 	~Lexer( void );
-	Lexer( Lexer const & );
-	Lexer	& operator=( Lexer const & );
 
 	Lexer( std::string const &, Options const & );
 
@@ -40,13 +38,16 @@ public:
 
 private:
 	Lexer( void );
+	Lexer( Lexer const & );
+	Lexer	& operator=( Lexer const & );
+
 	void	registerToken( tokenLabel, std::string const & );
 	void	lex( Options const & );
 	token	createSingleToken( std::string const & ) const;
 	void	tokenize( std::vector<std::vector<std::string> > const & );
-	std::vector<std::string>	splitStr( std::string const &, std::string const & ) const;
-	std::vector<std::vector<std::string> >	filterStream( void ) const;
 	void	displayErrors( void );
+	std::vector<std::vector<std::string> >	filterStream( void ) const;
+	std::vector<std::string>	splitStr( std::string const &, std::string const & ) const;
 
 	std::string	stream;
 	std::vector<std::vector<token > >	tokens;

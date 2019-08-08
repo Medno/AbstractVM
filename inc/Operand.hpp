@@ -9,17 +9,14 @@
 template<typename T>
 class Operand : public IOperand {
 public:
+	~Operand( void ) {}
 	Operand( T v, std::string const & s, eOperandType t ) : value(v), str(s), type(t) {
 		this->precision = static_cast<int>(t);
 	}
-	~Operand( void ) {}
-	Operand( Operand const & src ) { *this = src; }
-	Operand	& operator=( Operand const & ) { return *this; }
 
 	std::string const & toString( void ) const { return ( this->str ); }
 	int				getPrecision( void ) const { return ( this->precision ); }
 	eOperandType	getType( void ) const { return ( this->type ); }
-	T	getValue( void ) const { return ( this->value ); }
 
 	static IOperand const *castOperator( eOperandType type, double res ) {
 		if (type == 0 && res <= INT8_MAX && res >= INT8_MIN)
@@ -40,6 +37,23 @@ public:
 					std::to_string(res));
 		throw std::out_of_range("Out of range");
 	}
+	class	ModuloByZeroException: public std::exception {
+		public:
+			virtual const char*	what( void ) const throw() {
+				return "Modulo by 0";
+			}
+	};
+	class	DivisionByZeroException: public std::exception {
+		public:
+			virtual const char*	what( void ) const throw() {
+				return "Division by 0";
+			}
+	};
+
+private:
+	Operand( void ) {}
+	Operand( Operand const & src ) { *this = src; }
+	Operand	& operator=( Operand const & ) { return *this; }
 
 	virtual IOperand const * operator+( IOperand const & rhs ) const {
 		double res = stod(this->toString()) + stod(rhs.toString());
@@ -80,20 +94,7 @@ public:
 		: rhs.getType();
 		return Operand::castOperator(newType, res);
 	}
-	class	ModuloByZeroException: public std::exception {
-		public:
-			virtual const char*	what( void ) const throw() {
-				return "Modulo by 0";
-			}
-	};
-	class	DivisionByZeroException: public std::exception {
-		public:
-			virtual const char*	what( void ) const throw() {
-				return "Division by 0";
-			}
-	};
 
-private:
 	T				value;
 	int				precision;
 	std::string const	str;

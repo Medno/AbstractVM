@@ -9,13 +9,7 @@
 
 class	Execution {
 public:
-/*
- * Canonical form
-*/
-	Execution( void );
 	~Execution( void );
-	Execution( Execution const & );
-	Execution	& operator=( Execution const &);
 
 	Execution( Lexer const & , Options const & );
 	class	StackLessThanTwoException: public std::exception {
@@ -38,6 +32,28 @@ public:
 		public:
 			virtual const char*	what( void ) const throw();
 	};
+	
+private:
+	Execution( void );
+	Execution( Execution const & );
+	Execution	& operator=( Execution const &);
+
+	typedef void ( Execution::*memberPtr )( std::vector<Lexer::token> const & );
+	std::stack<IOperand const *>	stack;
+	std::map<tokenLabel, memberPtr>	fMap;
+	std::map<tokenLabel, eOperandType>	typeMap;
+	int	opt;
+
+	void	handleException( std::string const & instruction );
+	void	registerHandler( tokenLabel type, memberPtr ptr );
+	void	printInstruction( std::string const & instr ) const;
+	static bool	isInt( IOperand const * check );
+
+	void	printStack( void ) const;
+	void	handleExecution( Lexer const & lexer );
+/*
+ *	Instructions
+*/
 	void	push( std::vector<Lexer::token> const & );
 	void	pop( std::vector<Lexer::token> const & );
 	void	dump( std::vector<Lexer::token> const & );
@@ -55,20 +71,6 @@ public:
 	void	m_not( std::vector<Lexer::token> const & );
 	void	m_min( std::vector<Lexer::token> const & );
 	void	m_max( std::vector<Lexer::token> const & );
-
-	void	printStack( void ) const;
-	void	handleExecution( Lexer const & lexer );
-private:
-	typedef void ( Execution::*memberPtr )( std::vector<Lexer::token> const & );
-	std::stack<IOperand const *>	stack;
-	std::map<tokenLabel, memberPtr>	fMap;
-	void	registerHandler( tokenLabel type, memberPtr ptr );
-	void	printInstruction( std::string const & instr ) const;
-	static bool	isInt( IOperand const * check );
-
-	void	handleException( std::string const & instruction );
-	std::map<tokenLabel, eOperandType>	typeMap;
-	int	opt;
 };
 
 #endif

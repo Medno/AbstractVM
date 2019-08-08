@@ -12,14 +12,17 @@ class	Options {
 public:
 	Options( void );
 	~Options( void );
+
+	typedef std::pair<int, std::pair<std::string, std::string> > opt;
+
 	void	handleOpt( int, char **, int * );
-	void	displayUsage( void );
 	int		getEffective( void ) const;
+	void	displayUsage( void );
+
 	class	UnknownOptionException: public std::invalid_argument {
 		public:
 			UnknownOptionException(const char *str);
 	};
-	typedef std::pair<int, std::pair<std::string, std::string> > opt;
 
 private:
 	Options( Options const & );

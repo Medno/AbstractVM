@@ -7,10 +7,10 @@
 class Parser {
 public:
 	~Parser( void );
-	Parser( Parser const & );
-	Parser	& operator=( Parser const & );
 
 	Parser( Lexer const & );
+	int	getError( void ) const;
+
 	class	IntructionTooLongException: public std::exception {
 		public:
 			virtual const char*	what( void ) const throw();
@@ -44,12 +44,15 @@ public:
 			virtual const char*	what( void ) const throw();
 	};
 
-	int	getError( void ) const;
-
 private:
-	typedef void ( Parser::*memberPtr )( std::vector<Lexer::token> const & );
 	Parser( void );
+	Parser( Parser const & );
+	Parser	& operator=( Parser const & );
+
+	typedef void ( Parser::*memberPtr )( std::vector<Lexer::token> const & );
 	int		error;
+	std::map<tokenLabel, memberPtr>	handler;
+
 	void	registerTokenHandling( tokenLabel, memberPtr );
 	void	parse( Lexer const & );
 	void	handleSingleInstruction(std::vector<Lexer::token> const &);
@@ -57,7 +60,6 @@ private:
 	void	handleValueInstruction( std::vector<Lexer::token> const & );
 	void	invalidInstruction( std::vector<Lexer::token> const & );
 	void	handleException( int const & i );
-	std::map<tokenLabel, memberPtr>	handler;
 };
 
 #endif

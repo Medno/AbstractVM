@@ -1,6 +1,10 @@
 #include "Execution.hpp"
 
 Execution::Execution( void ) {}
+Execution::~Execution( void ) {}
+Execution::Execution( Execution const & src ) { *this = src; }
+Execution &	Execution::operator=( Execution const & ) { return *this; }
+
 Execution::Execution( Lexer const & lexer, Options const & option )
 : opt(option.getEffective()){
 	this->registerHandler(PUSH, &Execution::push);
@@ -19,7 +23,6 @@ Execution::Execution( Lexer const & lexer, Options const & option )
 	this->registerHandler(NOT, &Execution::m_not);
 	this->registerHandler(MIN, &Execution::m_min);
 	this->registerHandler(MAX, &Execution::m_max);
-//	this->registerHandler(EXIT, &Execution::exit);
 
 	this->typeMap[INT8] = Int8;
 	this->typeMap[INT16] = Int16;
@@ -28,9 +31,6 @@ Execution::Execution( Lexer const & lexer, Options const & option )
 	this->typeMap[DOUBLE] = Double;
 	this->handleExecution( lexer );
 }
-Execution::~Execution( void ) {}
-Execution::Execution( Execution const & src ) { *this = src; }
-Execution &	Execution::operator=( Execution const & ) { return *this; }
 
 /*
  * Exception classes
