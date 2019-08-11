@@ -334,7 +334,7 @@ void	Execution::handleExecution( Lexer const & lexer ) {
 			try {
 				if ( instruction[0].first == EXIT ) {
 					if ( static_cast<unsigned long>(&instruction - &tokens[0]) != tokens.size() - 1 )
-						std::cout << "Warning: Remaining instruction after exit instruction" << '\n';
+						std::cout << "\033[1;33mWarning:\033[0m \033[1;37mRemaining instruction after exit instruction\033[0m" << '\n';
 					return ;
 				}
 				if (this->opt & OPT_VERBOSE)

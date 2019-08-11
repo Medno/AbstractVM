@@ -1,4 +1,6 @@
 push int32(42)
 push int8(2)
+dump
 and
+dump
 exit
