@@ -79,6 +79,6 @@ int	main( int ac, char **av ) {
 		}
 		if ( !errors )
 			execution.handleExecution( lexer );
-	} while ( opt & OPT_INTERACTIVE && (str != "exit\n" && str != ";;\n")/* Catch exit / ;; */);
+	} while ( std::cin && opt & OPT_INTERACTIVE && (str != "exit\n" && str != ";;\n") );
 	return (0);
 }

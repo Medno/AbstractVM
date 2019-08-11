@@ -29,7 +29,7 @@ public:
 			return OperandFactory::getOp()->createOperand( type,
 					std::to_string(static_cast<int32_t>(res)));
 		else if (type == 3 && res <= std::numeric_limits<float>::max()
-				&& res >= std::numeric_limits<float>::min() )
+				&& res >= std::numeric_limits<float>::lowest() )
 			return OperandFactory::getOp()->createOperand( type,
 					std::to_string(static_cast<float>(res)));
 		else if (type == 4)

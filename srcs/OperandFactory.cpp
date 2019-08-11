@@ -125,7 +125,7 @@ OperandFactory::createFloat( std::string const & value ) const {
 		converted = std::stof(value);
 		if ( converted > std::numeric_limits<float>::max())
 			throw OverflowException("Overflow on float type");
-		else if ( converted < std::numeric_limits<float>::min() )
+		else if ( converted < std::numeric_limits<float>::lowest() )
 			throw UnderflowException("Underflow on float type");
 		filtered << converted;
 		return new Operand<float>( converted, filtered.str(), Float );
