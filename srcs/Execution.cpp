@@ -332,9 +332,11 @@ void	Execution::handleExecution( Lexer const & lexer ) {
 	try {
 		for (auto&& instruction : tokens) {
 			try {
-				if (instruction[0].first == EXIT)
-					// Catch instruction after exit ? 
+				if ( instruction[0].first == EXIT ) {
+					if ( static_cast<unsigned long>(&instruction - &tokens[0]) != tokens.size() - 1 )
+						std::cout << "Warning: Remaining instruction after exit instruction" << '\n';
 					return ;
+				}
 				if (this->opt & OPT_VERBOSE)
 					this->printInstruction(instruction[0].second);
 				(this->*fMap[instruction[0].first])(instruction);
@@ -345,7 +347,8 @@ void	Execution::handleExecution( Lexer const & lexer ) {
 			if ( (this->opt & OPT_VERBOSE) )
 				this->printStack();
 		}
-		throw MissingExitInstructionException();
+		if ( !(this->opt & OPT_INTERACTIVE) )
+			throw MissingExitInstructionException();
 	} catch ( MissingExitInstructionException &e ) {
 		this->handleException( "exit" );
 	}

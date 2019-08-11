@@ -15,7 +15,13 @@ std::string	readStdin( int opt ) {
 	std::stringstream	ss;
 
 	do {
+		if ( opt & OPT_INTERACTIVE )
+			std::cout << "> ";
 		std::getline(std::cin, line);
+		if ( !std::cin ) {
+			std::cout << "\033[1;31mError:\033[0m \033[1;37mCannot read on standard input\033[0m" << '\n';
+			return "\n";
+		}
 		ss << line << std::endl;
 	} while ( line != ";;" && !(opt & OPT_INTERACTIVE));
 	return ( ss.str() );
@@ -61,18 +67,18 @@ int	main( int ac, char **av ) {
 	do {
 		str.clear();
 		str = ( index == ac ) ? readStdin( opt ) : readFile( av[index] );
-		if (str == "\n" && opt & OPT_INTERACTIVE)
+		if ( (str == "\n" && !(opt & OPT_INTERACTIVE)) || str == "")
 			return (1);
 		Lexer	lexer( str, options );
 		Parser	parser( lexer );
 		int		errors = parser.getError();
-		if ( errors ) {
+		if ( errors && !( opt & OPT_INTERACTIVE )) {
 			std::cout << errors << " error" << (errors > 1 ? "s" : "") << " generated." << '\n'
 				<< "AVM: Cannot assemble " << (index == ac ? "in stdin" : av[index]) << std::endl;
 			return (1);
 		}
-		execution.handleExecution( lexer );
-		std::cout << "Content |" << str << "|\n";
-	} while ( opt & OPT_INTERACTIVE && str != "exit" && str != "");
+		if ( !errors )
+			execution.handleExecution( lexer );
+	} while ( opt & OPT_INTERACTIVE && (str != "exit\n" && str != ";;\n")/* Catch exit / ;; */);
 	return (0);
 }
