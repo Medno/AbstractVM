@@ -12,6 +12,7 @@ Parser::Parser( Parser const & src ) {
 Parser	& Parser::operator=( Parser const & rhs ) {
 	if ( this != &rhs ) {
 		this->error = rhs.error;
+		this->handler = rhs.handler;
 	}
 	return *this;
 }

@@ -9,8 +9,10 @@ Options::Options( void ) : effective(0) {
 Options::~Options( void ) {}
 Options::Options( Options const & src ) { *this = src; }
 Options &	Options::operator=( Options const & rhs ) {
-	if (this->effective != rhs.effective)
+	if (this->effective != rhs.effective) {
 		this->effective = rhs.effective;
+		this->available = rhs.available;
+	}
 	return *this;
 }
 

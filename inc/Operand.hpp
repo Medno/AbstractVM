@@ -53,7 +53,15 @@ public:
 private:
 	Operand( void ) {}
 	Operand( Operand const & src ) { *this = src; }
-	Operand	& operator=( Operand const & ) { return *this; }
+	Operand	& operator=( Operand const & rhs ) {
+		if ( this != &rhs ) {
+			this->value = rhs.value;
+			this->precision = rhs.precision;
+			this->str = rhs.str;
+			this->type = rhs.type;
+		}
+		return *this;
+	}
 
 	virtual IOperand const * operator+( IOperand const & rhs ) const {
 		double res = stod(this->toString()) + stod(rhs.toString());

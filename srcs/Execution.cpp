@@ -3,7 +3,15 @@
 Execution::Execution( void ) {}
 Execution::~Execution( void ) {}
 Execution::Execution( Execution const & src ) { *this = src; }
-Execution &	Execution::operator=( Execution const & ) { return *this; }
+Execution &	Execution::operator=( Execution const & rhs ) {
+	if ( this != &rhs ) {
+		this->stack = rhs.stack;
+		this->fMap = rhs.fMap;
+		this->typeMap = rhs.typeMap;
+		this->opt = rhs.opt;
+	}
+	return *this;
+}
 
 Execution::Execution( Options const & option )
 : opt(option.getEffective()){

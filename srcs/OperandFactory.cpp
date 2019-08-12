@@ -15,8 +15,13 @@ OperandFactory::OperandFactory( void ) {
 OperandFactory::~OperandFactory( void ) {
 	this->fMap.clear();
 }
-OperandFactory::OperandFactory( OperandFactory const & ) {}
-OperandFactory	& OperandFactory::operator=( OperandFactory const & ) { return *this; }
+OperandFactory::OperandFactory( OperandFactory const & src ) { *this = src; }
+OperandFactory	& OperandFactory::operator=( OperandFactory const & ) {
+	if ( this != &rhs ) {
+		this->fMap = rhs.fMap;
+	}
+	return *this;
+}
 
 /*
  * Exception classes
