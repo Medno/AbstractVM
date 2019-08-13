@@ -23,6 +23,7 @@ Execution::Execution( Options const & option )
 	this->registerHandler(SUB, &Execution::sub);
 	this->registerHandler(MUL, &Execution::mul);
 	this->registerHandler(DIV, &Execution::div);
+	this->registerHandler(MOD, &Execution::mod);
 	this->registerHandler(PRINT, &Execution::print);
 
 	this->registerHandler(AND, &Execution::m_and);
