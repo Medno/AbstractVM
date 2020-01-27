@@ -7,7 +7,7 @@
 
 ## Overview
 
-AVM is composed of a series of instructions, but have limited types. The AVM program has a complete lexical and parsing analysis. It will display errors with unknown command or bad semantic. You can use it as a calculator or to display text with display instructions.
+The language of AVM is composed of a series of instructions, but have limited types. The AVM program has a complete lexical and parsing analysis. It will display errors with unknown command or bad semantic. You can use it as a calculator or to display text with display instructions.
 
 It includes a lot of features:
 - Interactive mode
