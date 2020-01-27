@@ -64,6 +64,12 @@ int	main( int ac, char **av ) {
 
 	std::string	str;
 	int	opt = options.getEffective();
+
+	if (opt & OPT_INTERACTIVE && index != ac) {
+		std::cout << "AVM: Error: Interactive mode can only handle stdin"
+			<< std::endl;
+		return (1);
+	}
 	do {
 		str.clear();
 		str = ( index == ac ) ? readStdin( opt ) : readFile( av[index] );
